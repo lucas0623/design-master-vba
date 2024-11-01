@@ -115,11 +115,11 @@ End Sub
 '        posX = posX + shp1.Width + 5
 '    Next shp1
 'End Sub
-Private Function GetWSList(WB As Workbook) As String()
+Private Function GetWSList(wb As Workbook) As String()
     Dim numSheet As Integer, retArr() As String
 
     Dim count As Integer
-    With WB
+    With wb
         numSheet = .Worksheets.count
 
         If ws_WSData_tar Is Nothing Then
