@@ -1,0 +1,7 @@
+﻿'@Folder("Module")
+Sub Workbook_Open()
+    Dim mDataSheetSystem As New DataSheetSystem
+    mDataSheetSystem.prop("logFilePath", "path") = ""
+End Sub
+
+
