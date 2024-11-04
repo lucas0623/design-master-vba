@@ -4,6 +4,8 @@
 
 <tab id = "first_tab" label = "Design Master">
 	<group id = "group1" label = "Set Up">
+		<button id = "btn_SetupWorkbook" label = "Set Up Workbook" imageMso = "OpenStartPage" onAction = "ProcessRibbon_DM" size = "large"
+		supertip = "Create all necessary sheets for the add-in."/> 
 		<button id = "btn_ImportDesignWS" label = "Import Design Worksheet" imageMso = "ImportWorkbook" onAction = "ProcessRibbon_DM" size = "large"/> 
 		<menu id="menu11" label="Create New Summary Sheet" imageMso="FPTable" size = "large">
 			<button id = "btn_CreateSummaryEmpty" label = "Empty Summary Sheet" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 

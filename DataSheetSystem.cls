@@ -12,12 +12,15 @@ Attribute VB_Exposed = False
 Private ws_sys As Worksheet
 Private wsInteract As clsWorksheetsInteraction
 Private genFuncs As clsGeneralFunctions
+Private mIsInitialized As Boolean
 Private Const DataDeliminator As String = "##"
 
 Sub Class_Initialize()
-    Set ws_sys = Worksheets("Data_System")
+    
     Set wsInteract = New clsWorksheetsInteraction
     Set genFuncs = New clsGeneralFunctions
+    Set ws_sys = wsInteract.setWorksheet("Data_System", isSkipErr:=True)
+    If Not ws_sys Is Nothing Then mIsInitialized = True
 End Sub
 
 'Function SetProp(propGrp As String, propName As String) As Variant
@@ -29,6 +32,9 @@ End Sub
 'End Function
 
 
+Property Get isInitialized() As Boolean
+    isInitialized = mIsInitialized
+End Property
 
 Property Let prop(propGrp As String, propName As String, val As Variant)
     Dim rng1 As Range
@@ -313,3 +319,4 @@ Public Sub RestoreToDefault()
     prop("isCreated", "isIdentifiedConn") = False
     prop("isCreated", "isMappedConn") = False
 End Sub
+
