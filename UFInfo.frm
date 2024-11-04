@@ -13,6 +13,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '@Folder("Userform.GeneralForm")
 
 '********************************************************
@@ -53,6 +54,8 @@ Private Sub HandleDragMove(HWND As Long)
     Call ReleaseCapture
     Call SendMessage(HWND, WM_NCLBUTTONDOWN, HTCAPTION, 0&)
 End Sub
+
+
 
 
 Private Sub LabelX_Click()
