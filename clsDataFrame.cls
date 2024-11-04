@@ -11,6 +11,10 @@ Attribute VB_Exposed = False
 'This module contains the data frame class
 'Reference was made to python pandas
 
+'NOTE
+'*********************
+'All header names shall be unique
+'*********************
 'Last Update
 '06 Apr 2023: Updated ReadWS Sub with Error Handling Feature
 '14 Feb 2023: Find function with interpolate functions
@@ -125,7 +129,7 @@ Sub Init_ReadWorksheet(Optional ws As Worksheet, Optional col_tag As Long = 1, O
     'first row of data will be the reference row (first label in the first column) +1.
     'return nothing if any error occur
 
-    On Error GoTo ErrHandler
+    'On Error GoTo ErrHandler
     Const sProcName As String = "Init_ReadWorksheet"
     Dim count As Long, i As Long, j As Long
     Dim fRow As Long
@@ -181,6 +185,7 @@ Sub Init_ReadWorksheet(Optional ws As Worksheet, Optional col_tag As Long = 1, O
             Dim cell As Variant
             count = 1
             For Each cell In rng_heads
+                Debug.Print cell.Text
                 pHeads(count) = cell.Text
                 count = count + 1
             Next

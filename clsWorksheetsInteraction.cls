@@ -237,8 +237,32 @@ Err_cantFindWS:
     End If
 End Function
 Public Function FindFirstNonEmptyCell(rng As Range) As Range
-    Set FindFirstNonEmptyCell = rng.Find(What:="*", LookIn:=xlValues)
+    On Error GoTo ErrHandler
+    
+    ' Check if the first cell in the range is non-empty
+    If Not IsEmpty(rng.Cells(1, 1).value) Then
+        Set FindFirstNonEmptyCell = rng.Cells(1, 1)
+        Exit Function
+    End If
+    
+    ' Use Find method to locate the first non-empty cell
+    Dim foundCell As Range
+    Set foundCell = rng.Find(What:="*", LookIn:=xlValues, LookAt:=xlPart, _
+                             SearchOrder:=xlByRows, SearchDirection:=xlNext)
+    
+    If Not foundCell Is Nothing Then
+        Set FindFirstNonEmptyCell = foundCell
+    Else
+        Set FindFirstNonEmptyCell = Nothing
+    End If
+
+    Exit Function
+
+ErrHandler:
+    ' Handle errors (e.g., if no non-empty cell is found)
+    Set FindFirstNonEmptyCell = Nothing
 End Function
+
 
 Public Function FindLastNonEmptyCell(rng As Range) As Range
     Set FindLastNonEmptyCell = rng.Find(What:="*", LookIn:=xlValues, SearchDirection:=xlPrevious)
