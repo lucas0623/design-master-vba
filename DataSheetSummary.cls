@@ -86,7 +86,7 @@ Public Sub Initialize(wsName As String)
     rCol = wsInteract.getLocVar(pWS, Me.section, True, isMustMatch:=False)
     If rCol = -1 Then rCol = wsInteract.getLocVar(pWS, Me.memName, True, isMustMatch:=False)
     If rCol = -1 Then rCol = wsInteract.getLocVar(pWS, Me.p, True, isMustMatch:=False)
-    If rCol = -1 Then rCol = wsInteract.getLocVar(pWS, Me.targetWS, True, isMustMatch:=False)
+    If rCol = -1 Then rCol = wsInteract.getLocVar(pWS, Me.targetWs, True, isMustMatch:=False)
     
     lRow = wsInteract.FindLastRow(iRow + 1, rCol, pWS)
     If lRow <= iRow Then lRow = iRow
@@ -289,8 +289,8 @@ Public Property Get M3() As String
     M3 = mCollProps("M3").Text
 End Property
 
-Public Property Get targetWS() As String
-    targetWS = mCollProps("targetWS").Text
+Public Property Get targetWs() As String
+    targetWs = mCollProps("targetWS").Text
 End Property
 
 Public Property Get startRowWritten() As Long
