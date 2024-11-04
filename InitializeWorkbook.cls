@@ -23,17 +23,17 @@ End Sub
 
 Sub InitializeDataJoint(sheetName As String)
     Dim ws As Worksheet
-    Dim WB As Workbook
+    Dim wb As Workbook
     
     ' Reference the current workbook
-    Set WB = ThisWorkbook
+    Set wb = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = WB.Worksheets.Add
+        Set ws = wb.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = WB.Worksheets(sheetName)
+        Set ws = wb.Worksheets(sheetName)
     End If
     
     ' Initialize the worksheet headers assuming it's "Data_Joint"
@@ -52,17 +52,17 @@ End Sub
 
 Sub InitializeDataJointConn(sheetName As String)
     Dim ws As Worksheet
-    Dim WB As Workbook
+    Dim wb As Workbook
     
     ' Reference the current workbook
-    Set WB = ThisWorkbook
+    Set wb = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = WB.Worksheets.Add
+        Set ws = wb.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = WB.Worksheets(sheetName)
+        Set ws = wb.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_JointConn"
@@ -88,17 +88,17 @@ End Sub
 
 Sub InitializeDataFrame(sheetName As String)
     Dim ws As Worksheet
-    Dim WB As Workbook
+    Dim wb As Workbook
     
     ' Reference the current workbook
-    Set WB = ThisWorkbook
+    Set wb = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = WB.Worksheets.Add
+        Set ws = wb.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = WB.Worksheets(sheetName)
+        Set ws = wb.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_Frame"
@@ -121,17 +121,17 @@ End Sub
 
 Sub InitializeDataFrameForce(sheetName As String)
     Dim ws As Worksheet
-    Dim WB As Workbook
+    Dim wb As Workbook
     
     ' Reference the current workbook
-    Set WB = ThisWorkbook
+    Set wb = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = WB.Worksheets.Add
+        Set ws = wb.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = WB.Worksheets(sheetName)
+        Set ws = wb.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_FrameForce"
