@@ -10,128 +10,151 @@ Attribute VB_Exposed = False
 '@Folder("Operation")
 
 Sub Main()
-    ' Initialize the necessary worksheets
+    'Initialize the necessary worksheets
     InitializeDataJoint "Data_Joint"
     InitializeDataFrame "Data_Frame"
     InitializeDataJointConn "Data_JointConn"
-    InitializeDataMemberList "Data_MemberList"
-    InitializeDataFrameForce "Data_FrameForce"
-    InitializeWSData "WS_Data"
+    InitializeDataMemberList "Data_MemberList" 'checked
+    InitializeDataFrameForce "Data_FrameForce" 'checked
+    InitializeWSData "WSData" 'checked
     InitializeDefineConnectionType "Define_ConnectionType"
-    InitializeDataSystem "Data_System"
+    InitializeDataSystem "Data_System" 'checked
 End Sub
 
 Sub InitializeDataJoint(sheetName As String)
     Dim ws As Worksheet
-    Dim wb As Workbook
+    Dim WB As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set WB = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = WB.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Set ws = WB.Worksheets(sheetName)
     End If
     
     ' Initialize the worksheet headers assuming it's "Data_Joint"
     ' Adjust the following if different setups are needed for each sheet
     With ws
         If sheetName = "Data_Joint" Then
-            .Cells(1, 1).value = "rRow"
+            .Cells(2, 1).value = "rRow"
+            .Cells(1, 2).value = "ID"
+            .Cells(1, 3).value = "x"
+            .Cells(1, 4).value = "y"
+            .Cells(1, 5).value = "z"
+            .Cells(1, 6).value = "isRestraint"
             .Cells(2, 2).value = "Node ID"
             .Cells(2, 3).value = "X"
             .Cells(2, 4).value = "Y"
             .Cells(2, 5).value = "Z"
-            .Cells(2, 6).value = "isRestraint"
+            .Cells(2, 6).value = "True/False"
         End If
+        
+        .Range("B2:F2").Interior.Color = RGB(226, 239, 218)
     End With
+    
+    
 End Sub
 
 Sub InitializeDataJointConn(sheetName As String)
     Dim ws As Worksheet
-    Dim wb As Workbook
+    Dim WB As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set WB = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = WB.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Set ws = WB.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_JointConn"
     With ws
-        .Cells(1, 1).value = "rRow"
-        .Cells(2, 1).value = "Node ID"
+        .Cells(2, 1).value = "rRow"
+        
         .Cells(1, 2).value = "jtID"
-        .Cells(2, 2).value = "Node ID"
         .Cells(1, 3).value = "memID"
-        .Cells(2, 3).value = "Continuous Member"
         .Cells(1, 4).value = "eleID"
-        .Cells(2, 4).value = "Corresponding Elements"
         .Cells(1, 5).value = "sections"
-        .Cells(2, 5).value = "Corresponding Sections"
         .Cells(1, 6).value = "isRestraint"
-        .Cells(2, 6).value = "Restraint"
         .Cells(1, 7).value = "isConn"
-        .Cells(2, 7).value = "Is Possible Connection?"
         .Cells(1, 8).value = "matchedType"
+        
+
+        .Cells(2, 2).value = "Node ID"
+        .Cells(2, 3).value = "Continuous Member"
+        .Cells(2, 4).value = "Corresponding Elements"
+        .Cells(2, 5).value = "Corresponding Sections"
+        .Cells(2, 6).value = "Restraint"
+        .Cells(2, 7).value = "Is Possible Connection?"
         .Cells(2, 8).value = "Matched Joint Type"
+        
+        .Range("B2:H2").Interior.Color = RGB(226, 239, 218)
+        .Columns("B:H").AutoFit
     End With
 End Sub
 
 Sub InitializeDataFrame(sheetName As String)
     Dim ws As Worksheet
-    Dim wb As Workbook
+    Dim WB As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set WB = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = WB.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Set ws = WB.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_Frame"
     With ws
         .Cells(1, 2).value = "eleID"
         .Cells(1, 3).value = "section"
-        .Cells(3, 2).value = "Frame"
-        .Cells(3, 3).value = "AnalSect"
-        .Cells(3, 4).value = "JointI"
-        .Cells(3, 5).value = "JointJ"
-        .Cells(3, 6).value = "Length"
-        .Cells(3, 7).value = "MemID"
-        .Cells(3, 8).value = "Link? Ele?"
-        .Cells(3, 9).value = "Orientation"
-        .Cells(3, 10).value = "Vertical/ Horizontal/ Diagonal"
-        .Cells(2, 2).value = "TABLE: Frame Section Assignments"
-        .Cells(4, 1).value = "rRow"
+        .Cells(1, 4).value = "jtI"
+        .Cells(1, 5).value = "jtJ"
+        .Cells(1, 6).value = "eleLen"
+        .Cells(1, 7).value = "memID"
+        .Cells(1, 8).value = "eleType"
+        .Cells(1, 9).value = "eleLocalAxis"
+        .Cells(1, 10).value = "eleOrientationType"
+        .Cells(2, 2).value = "Frame"
+        .Cells(2, 3).value = "AnalSect"
+        .Cells(2, 4).value = "JointI"
+        .Cells(2, 5).value = "JointJ"
+        .Cells(2, 6).value = "Length"
+        .Cells(2, 7).value = "MemID"
+        .Cells(2, 8).value = "Link? Ele?"
+        .Cells(2, 9).value = "Orientation"
+        .Cells(2, 10).value = "Vertical/ Horizontal/ Diagonal"
+        .Cells(2, 1).value = "rRow"
+        
+        .Range("B3:J3").Interior.Color = RGB(226, 239, 218)
+        .Columns("B:J").AutoFit
     End With
 End Sub
 
 Sub InitializeDataFrameForce(sheetName As String)
     Dim ws As Worksheet
-    Dim wb As Workbook
+    Dim WB As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set WB = ThisWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = WB.Worksheets.Add
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Set ws = WB.Worksheets(sheetName)
     End If
     
     ' Set up the headers in "Data_FrameForce"
@@ -163,11 +186,19 @@ Sub InitializeDataFrameForce(sheetName As String)
         .Cells(3, 14).value = "MemID"
         .Cells(1, 15).value = "subEleName"
         .Cells(3, 15).value = "Element"
-        .Cells(4, 1).value = "rRow"
+        .Cells(3, 1).value = "rRow"
 
         ' Write formulas
         .Cells(4, 13).formula = "=XLOOKUP(C4,Data_Frame!$B:$B,Data_Frame!$C:$C)"
         .Cells(4, 14).formula = "=XLOOKUP(C4,Data_Frame!$B:$B,Data_Frame!$G:$G)"
+        
+        With .Range("C3:O50").Borders
+            .LineStyle = xlContinuous
+            .Weight = xlThin
+        End With
+        .Range("C3:O3").Interior.Color = RGB(226, 239, 218)
+        .Range("C3:O3").Font.Bold = True
+        .Range("C2").Font.Bold = True
     End With
 End Sub
 
@@ -186,7 +217,7 @@ Sub InitializeDataMemberList(sheetName As String)
 
     ' Initialize headers
     With ws
-        .Cells(1, 1).value = "rRow"
+        .Cells(2, 1).value = "rRow"
         .Cells(1, 2).value = "MemberID"
         .Cells(1, 3).value = "fFrame"
         .Cells(1, 4).value = "lFrame"
@@ -198,6 +229,26 @@ Sub InitializeDataMemberList(sheetName As String)
         .Cells(1, 10).value = "eleListBetweenRestrNodesMajor"
         .Cells(1, 11).value = "restrNodesMinor"
         .Cells(1, 12).value = "eleListBetweenRestrNodesMinor"
+        .Cells(2, 2).value = "Member"
+        .Cells(2, 3).value = "First Element"
+        .Cells(2, 4).value = "Last Element"
+        .Cells(2, 5).value = "Length"
+        .Cells(2, 6).value = "Element List"
+        .Cells(2, 7).value = "Restraint Nodes"
+        .Cells(2, 8).value = "Ele List between Rest. Nodes"
+        .Cells(2, 9).value = "Major Restraint Nodes"
+        .Cells(2, 10).value = "Ele List between maj. Res."
+        .Cells(2, 11).value = "Minor Restraint Nodes"
+        .Cells(2, 12).value = "Ele List between Minor Restraints"
+        
+'        With .Range("C3:O50").Borders
+'            .LineStyle = xlContinuous
+'            .Weight = xlThin
+'        End With
+        .Range("B2:L2").Interior.Color = RGB(226, 239, 218)
+        .Columns("B:L").AutoFit
+'        .Range("C3:O3").Font.Bold = True
+'        .Range("C2").Font.Bold = True
     End With
 End Sub
 
@@ -216,28 +267,62 @@ Sub InitializeWSData(sheetName As String)
 
     ' Initialize headers
     With ws
-        .Cells(1, 1).value = "rRow_tarWSData"
-        .Cells(1, 2).value = "Design Worksheet 1"
-        .Cells(1, 5).value = "Design Worksheet 2"
-
+        .Cells(2, 1).value = "rRow_tarWSData"
+        .Range("B1").value = "Design Worksheet 1"
+        .Range("B1").Font.size = 16
+        .Range("B1").Font.Bold = True
+        .Range("F1").value = "Design Worksheet 2"
+        .Range("F1").Font.size = 16
+        .Range("F1").Font.Bold = True
+        
         ' Set header for Design Worksheet 1
         .Cells(2, 2).value = "Design Input"
         .Cells(2, 3).value = "Location"
         .Cells(2, 4).value = "Design Output"
         .Cells(2, 5).value = "Location"
-
+        .Cells(3, 2).value = "Input 1"
+        .Cells(3, 3).value = "A1"
+        .Cells(3, 4).value = "Input 2"
+        .Cells(3, 5).value = "A2"
+        .Cells(4, 2).value = "Output 1"
+        .Cells(4, 3).value = "B1"
+        .Cells(4, 4).value = "Output 2"
+        .Cells(4, 5).value = "B2"
+        
         ' Set header for Design Worksheet 2
         .Cells(2, 6).value = "Design Input"
         .Cells(2, 7).value = "Location"
         .Cells(2, 8).value = "Design Output"
         .Cells(2, 9).value = "Location"
+        .Cells(3, 6).value = "Input 1"
+        .Cells(3, 7).value = "A1"
+        .Cells(3, 8).value = "Input 2"
+        .Cells(3, 9).value = "A2"
+        .Cells(4, 6).value = "Output 1"
+        .Cells(4, 7).value = "B1"
+        .Cells(4, 8).value = "Output 2"
+        .Cells(4, 9).value = "B2"
+        .rows(2).Font.Bold = True
+        
 
         ' Merge and center headers across cells
         .Range("B1:I1").HorizontalAlignment = xlCenterAcrossSelection
 
         ' Color columns B:I, except for row 2
-        .Range("B3:I50").Interior.Color = RGB(192, 192, 192)
-        .Range("B1:I1").Interior.Color = RGB(192, 192, 192)
+        .Range("B3:I50").Interior.Color = RGB(221, 235, 547)
+        .Range("B1:I1").Interior.Color = RGB(221, 235, 547)
+        .Columns("B:I").AutoFit
+        
+        .Columns("A").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("C").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("E").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("G").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("I").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("A").ColumnWidth = 0
+        .Columns("B").ColumnWidth = 20
+        .Columns("D").ColumnWidth = 20
+        .Columns("F").ColumnWidth = 20
+        .Columns("H").ColumnWidth = 20
     End With
 End Sub
 
@@ -257,6 +342,7 @@ Sub InitializeDefineConnectionType(sheetName As String)
     ' Initialize headers and formatting
     With ws
         ' Header titles
+        
         .Cells(1, 2).value = "connID"
         .Cells(1, 3).value = "mapJt"
         .Cells(1, 4).value = "mapMethod"
@@ -267,11 +353,24 @@ Sub InitializeDefineConnectionType(sheetName As String)
         .Cells(1, 9).value = "endOffset"
         .Cells(1, 10).value = "matchedJoint"
         
+        'Row 2
+        .Range("C2").value = "Mapping Controls"
+        .Range("G2").value = "Data Extraction Control"
+        .Range("C2").Font.Bold = True
+        .Range("G2").Font.Bold = True
+        .Range("C2:F2").HorizontalAlignment = xlCenterAcrossSelection
+        .Range("G2:I2").HorizontalAlignment = xlCenterAcrossSelection
+        .Range("C2:F2").Interior.Color = RGB(198, 224, 180)
+        
+        'Row 3
+        .Range("C3").value = "1: Specify Joint ID"
+        .Range("D3").value = "2: By Matching with Criteria"
+        .Range("C3:F3").Interior.Color = RGB(198, 224, 180)
+        .Range("G2:I3").Interior.Color = RGB(255, 230, 153)
+        .Range("D3:F3").HorizontalAlignment = xlCenterAcrossSelection
         ' Merging and labeling
-        .Range("B3:E3").Merge
-        .Cells(3, 2).value = "Mapping Controls"
-        .Range("F3:J3").Merge
-        .Cells(3, 6).value = "Data Extraction Control"
+        
+        .Cells(4, 1).value = "rRow"
         
         .Range("B4").value = "Connection Name"
         .Range("C4").value = "Joint ID"
@@ -283,11 +382,20 @@ Sub InitializeDefineConnectionType(sheetName As String)
         .Range("I4").value = "End Offset Setting"
         .Range("J4").value = "MACRO USE: Matched Joint"
         
+        
         ' Center and color formatting
-        .Range("B1:J1").HorizontalAlignment = xlCenterAcrossSelection
-        .Range("B3:J3").Interior.Color = RGB(192, 192, 192)
-        .Range("B4:E4").Interior.Color = RGB(224, 224, 224)
-        .Range("F4:J4").Interior.Color = RGB(255, 224, 192)
+        .Range("B4:F4").Interior.Color = RGB(226, 239, 218)
+        .Range("G4:I4").Interior.Color = RGB(255, 242, 204)
+        .Range("J4").Interior.Color = RGB(237, 237, 237)
+        .Range("B2:J4").WrapText = True
+        .Columns("A:J").ColumnWidth = 15
+        .rows("2:4").AutoFit
+        
+        With .Range("B2:J20").Borders
+            .LineStyle = xlContinuous
+            .Weight = xlThin
+        End With
+
     End With
 End Sub
 
