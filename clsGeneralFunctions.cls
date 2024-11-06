@@ -420,6 +420,7 @@ Public Sub QuickSortArray_2D(ByRef SortArray As Variant, Optional lngColumn As L
 End Sub
 
 Public Function SortArray(arr As Variant, Optional isA2Z As Boolean = True) As Variant
+    If Not isInitialised(arr) Then Exit Function
     Dim arrL As Object, i As Long
     Set arrL = CreateObject("System.Collections.ArrayList")
     For i = LBound(arr) To UBound(arr)
@@ -918,67 +919,40 @@ Public Function StringToBooleanArr(str As String) As Boolean()
     StringToBooleanArr = ChangeArrBase(boolArr, 0)
     
 End Function
-'************************************************************************************************************
-'*************************************OBSELETED************************************************
-'************************************************************************************************************
-'Sub AddItemsToDict(dict As Object, key As Variant, val As Variant)
-'    Dim newArr As Variant
-'    Dim i As Long
-'
-'    If dict.Exists(key) Then
-'        dict(key) = AddItemsToArr(dict(key), val)
-'    Else
-'        dict(key) = val
-'    End If
-'End Sub
 
+Public Function CombineArrays(arr1 As Variant, arr2 As Variant) As Variant
+    Dim resultArray() As Variant
+    Dim i As Long, j As Long
+    Dim size1 As Long, size2 As Long
 
+    ' Check if arr1 and arr2 are initialized arrays
+    If isInitialised(arr1) And Not isInitialised(arr2) Then
+        CombineArrays = arr1
+        Exit Function
+    ElseIf isInitialised(arr1) And Not isInitialised(arr2) Then
+        CombineArrays = arr2
+        Exit Function
+    ElseIf Not isInitialised(arr1) And Not isInitialised(arr2) Then
+        Exit Function
+    End If
 
-'Function DictToArr(dict As Object) As Variant
-'    Dim key As Variant
-'    For Each key In dict.keys
-'        If IsArray(dict(key)) Then
-'
-'        Else
-'
-'        End If
-'    Next key
-'End Function
+    ' Get the size of each array
+    size1 = UBound(arr1) - LBound(arr1) + 1
+    size2 = UBound(arr2) - LBound(arr2) + 1
 
-'Public Sub Filter(ByRef myWS As Worksheet, ByVal ref_firstRow As Integer, ByVal ref_firstCol As Integer, ByVal myCol As Integer, ByRef myArr As Variant)
-'    If .FilterMode Then
-'            .ShowAllData
-'    End If
-'
-'    If myCol < ref_firstCol Then
-'        MsgBox "Error: checking filter option"
-'        End
-'    End If
-'
-'    With myWS
-'
-'        .Range(.Cells(ref_firstRow, ref_firstCol), .Cells(ref_firstRow, myCol)).AutoFilter , _
-'        Field:=myCol - ref_firstCol + 1, _
-'        Criteria1:=myArr, _
-'        Operator:=xlFilterValues
-'    End With
-'
-'End Sub
-''This sub find the unique data of certain column, and then save it to an array
-'Public Sub FindUnique_Visible(ByRef myArr As Variant, rng As Range)
-'    'sourceCell and targetCell are the reference cell
-'
-'    Sheets.Add Before:=ActiveSheet
-'
-'        rng.SpecialCells(xlCellTypeVisible).Copy
-'        Cells(1, 1).PasteSpecial xlPasteValues
-'        Range("A:A").RemoveDuplicates Columns:=1, header:=xlNo
-'        myArr = SetArrayOneDim(1, 1, True)
-'
-'    Application.DisplayAlerts = False
-'    ActiveSheet.Delete
-'    Application.DisplayAlerts = True
-'End Sub
+    ' Resize the result array to fit elements of both arrays
+    ReDim resultArray(0 To size1 + size2 - 1)
 
+    ' Copy elements from arr1 to resultArray
+    For i = LBound(arr1) To UBound(arr1)
+        resultArray(i - LBound(arr1)) = arr1(i)
+    Next i
 
+    ' Copy elements from arr2 to resultArray
+    For j = LBound(arr2) To UBound(arr2)
+        resultArray(size1 + j - LBound(arr2)) = arr2(j)
+    Next j
+
+    CombineArrays = resultArray
+End Function
 

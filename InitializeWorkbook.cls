@@ -19,6 +19,7 @@ Sub Main()
     InitializeWSData "WSData" 'checked
     InitializeDefineConnectionType "Define_ConnectionType"
     InitializeDataSystem "Data_System" 'checked
+    MsgBox "Initialization Complete!"
 End Sub
 
 Sub InitializeDataJoint(sheetName As String)
@@ -26,14 +27,15 @@ Sub InitializeDataJoint(sheetName As String)
     Dim wb As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
+    Debug.Print "This Workbook Name: " & wb.name
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Exit Function
     End If
     
     ' Initialize the worksheet headers assuming it's "Data_Joint"
@@ -54,6 +56,7 @@ Sub InitializeDataJoint(sheetName As String)
         End If
         
         .Range("B2:F2").Interior.Color = RGB(226, 239, 218)
+        .Visible = xlSheetHidden
     End With
     
     
@@ -64,14 +67,14 @@ Sub InitializeDataJointConn(sheetName As String)
     Dim wb As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Exit Function
     End If
     
     ' Set up the headers in "Data_JointConn"
@@ -97,6 +100,7 @@ Sub InitializeDataJointConn(sheetName As String)
         
         .Range("B2:H2").Interior.Color = RGB(226, 239, 218)
         .Columns("B:H").AutoFit
+        .Visible = xlSheetHidden
     End With
 End Sub
 
@@ -105,14 +109,14 @@ Sub InitializeDataFrame(sheetName As String)
     Dim wb As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Exit Function
     End If
     
     ' Set up the headers in "Data_Frame"
@@ -139,6 +143,7 @@ Sub InitializeDataFrame(sheetName As String)
         
         .Range("B3:J3").Interior.Color = RGB(226, 239, 218)
         .Columns("B:J").AutoFit
+        .Visible = xlSheetHidden
     End With
 End Sub
 
@@ -147,14 +152,14 @@ Sub InitializeDataFrameForce(sheetName As String)
     Dim wb As Workbook
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
-        Set ws = wb.Worksheets.Add
+        Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Set ws = wb.Worksheets(sheetName)
+        Exit Function
     End If
     
     ' Set up the headers in "Data_FrameForce"
@@ -199,6 +204,7 @@ Sub InitializeDataFrameForce(sheetName As String)
         .Range("C3:O3").Interior.Color = RGB(226, 239, 218)
         .Range("C3:O3").Font.Bold = True
         .Range("C2").Font.Bold = True
+        .Visible = xlSheetHidden
     End With
 End Sub
 
@@ -208,11 +214,10 @@ Sub InitializeDataMemberList(sheetName As String)
     ' Check if the worksheet exists
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
-        Set ws = ThisWorkbook.Worksheets.Add
+        Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        ' Set the worksheet if it exists
-        Set ws = ThisWorkbook.Worksheets(sheetName)
+        Exit Function
     End If
 
     ' Initialize headers
@@ -241,14 +246,10 @@ Sub InitializeDataMemberList(sheetName As String)
         .Cells(2, 11).value = "Minor Restraint Nodes"
         .Cells(2, 12).value = "Ele List between Minor Restraints"
         
-'        With .Range("C3:O50").Borders
-'            .LineStyle = xlContinuous
-'            .Weight = xlThin
-'        End With
         .Range("B2:L2").Interior.Color = RGB(226, 239, 218)
         .Columns("B:L").AutoFit
-'        .Range("C3:O3").Font.Bold = True
-'        .Range("C2").Font.Bold = True
+
+        .Visible = xlSheetHidden
     End With
 End Sub
 
@@ -258,11 +259,10 @@ Sub InitializeWSData(sheetName As String)
     ' Check if the worksheet exists
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
-        Set ws = ThisWorkbook.Worksheets.Add
+        Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        ' Set the worksheet if it exists
-        Set ws = ThisWorkbook.Worksheets(sheetName)
+        Exit Function
     End If
 
     ' Initialize headers
@@ -332,11 +332,10 @@ Sub InitializeDefineConnectionType(sheetName As String)
     ' Check if the worksheet exists
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
-        Set ws = ThisWorkbook.Worksheets.Add
+        Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        ' Set the worksheet if it exists
-        Set ws = ThisWorkbook.Worksheets(sheetName)
+        Exit Function
     End If
 
     ' Initialize headers and formatting
@@ -395,7 +394,7 @@ Sub InitializeDefineConnectionType(sheetName As String)
             .LineStyle = xlContinuous
             .Weight = xlThin
         End With
-
+        
     End With
 End Sub
 
@@ -405,14 +404,15 @@ Sub InitializeDataSystem(sheetName As String)
     ' Check if the worksheet exists
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
-        Set ws = ThisWorkbook.Worksheets.Add
+        Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        ' Set the worksheet if it exists
-        Set ws = ThisWorkbook.Worksheets(sheetName)
+        Exit Function
     End If
 
     ' Initialize cells with values and formulas
+    Application.DisplayAlerts = False
+
     With ws
         ' Initialize <isWSImported>
         .Cells(1, 1).value = "<isWSImported>"
@@ -519,13 +519,15 @@ Sub InitializeDataSystem(sheetName As String)
 
         ' Set the column width for better readability
         .Columns("A:D").AutoFit
+        Application.DisplayAlerts = True
+        .Visible = xlSheetHidden
     End With
 End Sub
 
 Function WorksheetExists(sheetName As String) As Boolean
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = ThisWorkbook.Worksheets(sheetName)
+    Set ws = ActiveWorkbook.Worksheets(sheetName)
     On Error GoTo 0
     WorksheetExists = Not ws Is Nothing
 End Function

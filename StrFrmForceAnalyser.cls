@@ -91,7 +91,9 @@ Private Function FindExtremeForce_oneCase(frmForces As Collection, enum_extremeC
 
     
     g_log.WriteLogWithTime "   " & GetExtremeCaseName(enum_extremeCaseType) & " value:" & cExtremeForce.force(forceIndex)
-    g_log.WriteLog "   Frame Name: " & cExtremeForce.frameName & ", station: " & cExtremeForce.pos_fromEleJtI
+    g_log.WriteLog "   Frame Name: " & cExtremeForce.frameName & _
+                    ", Sub Element Name: " & cExtremeForce.subFrameName & _
+                    ", station: " & cExtremeForce.pos_fromEleJtI
     
 '    cFrmForce.Add cExtremeForce
 '    Dim nextFrmForce As StrFrameForce

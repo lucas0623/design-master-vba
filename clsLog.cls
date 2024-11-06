@@ -61,6 +61,7 @@ Public Sub Class_Initialize()
     'pPath = fso.GetParentFolderName(ActiveWorkbook.path) & "/Log.txt"
     On Error GoTo Err:
     pPath = lib_fileTools.GetLocalPath(ActiveWorkbook.path) & "\Log.txt"
+    If fso.FileExists(pPath) Then Exit Sub
     Set oFile = fso.CreateTextFile(pPath)
     Exit Sub
 Err:
@@ -75,7 +76,9 @@ Err:
         pPath = pPath & "\Log.txt"
     End If
     
-    mDataSheetSystem.prop("logFilePath", "path") = pPath
+    
+    
+    Resume Next
 End Sub
 
 Property Let path(str As String)
@@ -84,11 +87,20 @@ End Property
 
 Public Sub CreateNewFile(isDetailMode As Boolean)
     
-    'Set fso = CreateObject("Scripting.FileSystemObject")
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    On Error GoTo CleanCache
     Set oFile = fso.CreateTextFile(pPath)
+    On Error GoTo 0
     ReDim p_iWarn(12)
     oFile.WriteLine "Start at " & Format(Date, "dd MMM yyyy") & "-" & Time() & vbCrLf
     mIsDetailMode = isDetailMode
+    
+    Exit Sub
+CleanCache:
+    oFile.Close
+    Set oFile = fso.CreateTextFile(pPath)
+    Resume Next
 End Sub
 
 Public Sub WriteLogInDetailMode(sText As String)

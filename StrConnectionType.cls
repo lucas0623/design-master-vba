@@ -34,13 +34,22 @@ Public Sub InitForMapping(name As String, mapJtName As String, mapMethod As Stri
     mIsRestraint = isRestraint
 End Sub
 
-Public Sub InitForExtraction(name As String, extractSections As String, isFullyPopulate As Boolean, endOffset As Double, matchedJoint As Collection)
+Public Sub InitForExtraction(name As String, extractSections As String, isFullyPopulate As Variant, endOffset As Variant, matchedJoint As Collection)
     mName = name
     mExtractSections = Replace(extractSections, "'", "", 1, 1)
-    mIsFullyPopulate = isFullyPopulate
-    mEndOffset = endOffset
-    Set mJoints = matchedJoint
+    If VarType(isFullyPopulate) = vbBoolean Then
+        mIsFullyPopulate = isFullyPopulate
+    Else
+        mIsFullyPopulate = True
+    End If
     
+    If VarType(endOffset) = vbDouble Then
+        mEndOffset = endOffset
+    Else
+        mEndOffset = 0
+    End If
+    
+    Set mJoints = matchedJoint
     
 End Sub
 

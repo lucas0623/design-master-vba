@@ -386,7 +386,7 @@ Public Function FormConnTypeObjForForceExtract() As Integer
             Set connType = New StrConnectionType
             Set coll = New Collection
             matchedJoint = df.idata(i, col_matchedJoint)
-            If Not matchedJoint = vbNullString Then
+            If Not matchedJoint = vbNullString Or Not matchedJoint = "-" Then
                 jtNames = SplitAndTrimString(matchedJoint, ",")
                 For j = LBound(jtNames) To UBound(jtNames)
                     coll.Add SetJoint(mModel, jtNames(j))

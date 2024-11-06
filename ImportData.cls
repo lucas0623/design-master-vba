@@ -118,7 +118,7 @@ Private Sub WriteData()
         With ds_frmForce.tagSelector
             'rRow = ds_frmForce.lastRow + 1
             'If rRow = ds_frmForce.refRow + 2 Then rRow = rRow - 1 'as the first row of data will not be deleted for frame force sheet
-            ds_frmForce.WriteDataframe df_force, False, True, .eleID, .station, .loadComb, .stepType, .p, .V2, .V3, .t, .M2, .M3, .subFrameID
+            ds_frmForce.WriteDataframe df_force, False, True, .eleID, .station, .loadComb, .stepType, .p, .V2, .V3, .t, .M2, .M3, .subEleName
             ds_frmForce.FillColumns .section, .memID
         End With
         If Not mLog Is Nothing Then mLog.WriteLog "'Element Force and Moment Table' is sucessfully read and saved to the worksheet."

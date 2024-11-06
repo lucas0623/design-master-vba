@@ -80,7 +80,7 @@ Sub ViewWorkbookStatus()
     arr4(5, 0) = "Extract Connection Force"
     
     arr4(0, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "CreateMemberBySection"))
-    arr4(1, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "CreateMemerByKinkAngle"))
+    arr4(1, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "CreateMemberByKinkAngle"))
     arr4(2, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "IdentifyRestraint"))
     arr4(3, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "MapConnection"))
     arr4(4, 1) = CStr(DsSys.prop("WhatOperationCanProcess", "ExtractFrameForce"))

@@ -7,6 +7,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder "Library"
+
 Public Sub Log(ByVal inputVariant As Variant, ByVal variableName As String)
     Dim i As Long, j As Long
     

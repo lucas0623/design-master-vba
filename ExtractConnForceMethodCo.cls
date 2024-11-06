@@ -106,8 +106,8 @@ Nextj:
 Nextk:
             Next k
             If frmForces.count = 0 Then
-                g_log.RaiseWarning "WARNING: Fail to match any node for joint '" & _
-                                    matchedNodes(k) & "' of Connection Type '" & ConnTypeNames(i), failToMatchAnySectionForConnForceExtract
+                g_log.RaiseWarning "WARNING: Fail to match any section for Connection Type '" & ConnTypeNames(i) & _
+                                       "'. Please check the 'Output Section' in the 'Define_ConnectionType' Sheet.", failToMatchAnySectionForConnForceExtract
                 GoTo Nexti
             End If
             Set reFrmForcesNotConverted = GetExtremeCases(frmForces, ExtremeCases, MaxMinEnv)
@@ -127,6 +127,7 @@ Private Function GetFrameForcesCollForOneNode(connType As StrConnectionType, nod
     Dim retFrmForces As New Collection
     'Set cJt = mModel.GetStrObject(matchedNodes(j), obj_jt)
     extractSections = Split(connType.extractSections, ",")
+
     For Each cConnectedFrm In node.connectedFrames
         If genFunc.IsInArr(cConnectedFrm.section, extractSections) Then
             If cConnectedFrm.jtI.name = node.name Then

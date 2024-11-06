@@ -10,18 +10,23 @@ Attribute VB_Name = "Z_RibbonControl"
 Public g_log As New clsLog, isDetailMode As Boolean
 Private ds_sys As New DataSheetSystem
 
+
 Public Sub ProcessRibbon_DM(Control As IRibbonControl)
 
     'On Error GoTo Err:
 
     Application.Calculation = xlCalculationManual
     Application.ScreenUpdating = False
-
+    
+    If Not ds_sys.isInitialized Then CreateSystemSheet
     isDetailMode = ds_sys.prop("ImportLog", "isDetailMode")
+    'isDetailMode = True
     
     Select Case Control.ID
         'call different macro based on button name pressed
-
+        Case "btn_SetupWorkbook"
+            InitializeWorkbook
+            
         Case "btn_ImportDesignWS"
             ImportDesignWorkbook
 
@@ -106,6 +111,17 @@ Err:
     Application.ScreenUpdating = True
     Application.Calculation = xlAutomatic
 End Sub
+
+Private Sub CreateSystemSheet()
+    Dim oper As New InitializeWorkbook
+    oper.InitializeDataSystem "Data_System"
+End Sub
+
+Private Sub InitializeWorkbook()
+    Dim oper As New InitializeWorkbook
+    oper.Main
+End Sub
+
 
 Private Sub CreateNewSummary(index As Integer)
     Dim oper As New CreateNewSummary
@@ -370,6 +386,7 @@ End Sub
 
 Private Sub ShowVersion()
     Dim uf As New UFInfo
+    UFInfo.Initialize "v4.0.1", "05 Nov 2024"
     UFInfo.Show
 End Sub
 

@@ -15,7 +15,7 @@ Private Notification As New PropertyChangeNotification
 Private genFunc As clsGeneralFunctions
 Private ds_sys As DataSheetSystem
 Private dsManager As DataSheetManager
-
+Private console As New Debugger
 
 'Path for the Properties
 
@@ -187,74 +187,30 @@ Public Function LoadLastSaveVal()
     
     '2 Check if the saved data fit the default data (check ele, member, section and load comb)
     If Not mbIsLoadLastSaveVerified Then
-        Dim i As Long
-        Dim temp() As String, tempSec() As String, tempMember() As String
-        
-        temp = ds_sys.propCondense(propGrpName, "Load Comb Selected")
-        If genFunc.isInitialised(temp) Then temp = genFunc.CStr_arr(temp)
-        If Not VerifiedSavedData(temp, msLcAll) Then
-            g_log.WriteLogInDetailMode "Cannot verify saved load combination."
-            ret = -1
-            GoTo ExitFunc:
-        End If
-        
-'        If genFunc.isInitialised(tempLC) Then
-'            For i = LBound(tempLC) To UBound(tempLC)
-'                If Not genFunc.IsInArr(tempLC(i), msLcAll) Then
-'                    msWarningMsg = "Loading last saved data failed. Load Combination '" & tempLC(i) & "' cannot be found in the last saved data."
-'                    If mbIsShownUF Then MsgBox msWarningMsg
-'                    GoTo ExitFunc
-'                End If
-'            Next i
-'        End If
-        temp = ds_sys.propCondense(propGrpName, "Section Selected")
-        If genFunc.isInitialised(temp) Then temp = genFunc.CStr_arr(temp)
-        If Not VerifiedSavedData(temp, msSectionsAll) Then
-            g_log.WriteLogInDetailMode "Cannot verify saved section."
-            ret = -1
-            GoTo ExitFunc:
-        End If
-'        For i = LBound(tempSec) To UBound(tempSec)
-'            If Not genFunc.IsInArr(tempSec(i), msSectionsAll) Then
-'                msWarningMsg = "Loading last saved data failed. Section '" & tempSec(i) & "' cannot be found in the last saved data."
-'                If mbIsShownUF Then MsgBox msWarningMsg
-'                GoTo ExitFunc
-'            End If
-'        Next i
-        
-       ' temp = genFunc.CStr_arr(ds_sys.prop(propGrpName, "Member Selected"))
-'        For i = LBound(tempMember) To UBound(tempMember)
-'            If Not genFunc.IsInArr(tempMember(i), msMemberNamesAll) Then
-'                msWarningMsg = "Loading last saved data failed. Member '" & tempMember(i) & "' cannot be found in the last saved data."
-'                If mbIsShownUF Then MsgBox msWarningMsg
-'                GoTo ExitFunc
-'            End If
-'        Next i
-        temp = ds_sys.propCondense(propGrpName, "Member Selected")
-        If genFunc.isInitialised(temp) Then temp = genFunc.CStr_arr(temp)
-        If Not VerifiedSavedData(temp, msMemberNamesAll) Then
-            g_log.WriteLogInDetailMode "Cannot verify saved member."
-            ret = -1
-            GoTo ExitFunc:
-        End If
-        
-        temp = ds_sys.propCondense(propGrpName, "Connection Type Selected")
-        If genFunc.isInitialised(temp) Then temp = genFunc.CStr_arr(temp)
-        If Not VerifiedSavedData(temp, msConnTypeAll) Then
-            g_log.WriteLogInDetailMode "Cannot verify saved connection type."
-            ret = -1
-            GoTo ExitFunc:
-        End If
-        
-        temp = ds_sys.propCondense(propGrpName, "Node Selected")
-        If genFunc.isInitialised(temp) Then temp = genFunc.CStr_arr(temp)
-        If Not VerifiedSavedData(temp, msNodeAll) Then
-            g_log.WriteLogInDetailMode "Cannot verify saved node."
-            ret = -1
-            GoTo ExitFunc:
-        End If
+        Dim isIdentical As Boolean
         
         
+'        temp1 = ds_sys.propCondense(propGrpName, "Load Comb Selected")
+'        temp2 = ds_sys.propCondense(propGrpName, "Load Comb Excluded")
+'        temp = genFunc.CombineArrays(temp1, temp2)
+'        temp = genFunc.SortArray(temp)
+'        console.Log temp, "temp"
+'        If genFunc.isInitialised(temp) Then temp = ggenFunc.CStr_arr(temp)
+        isIdentical = VerifiedSavedData(propGrpName, "Load Comb Selected", "Load Comb Excluded", msLcAll)
+        If Not isIdentical Then GoTo CannotLoad
+
+        isIdentical = VerifiedSavedData(propGrpName, "Section Selected", "Section Excluded", msSectionsAll)
+        If Not isIdentical Then GoTo CannotLoad
+
+        isIdentical = VerifiedSavedData(propGrpName, "Member Selected", "Member Excluded", msMemberNamesAll)
+        If Not isIdentical Then GoTo CannotLoad
+        
+        isIdentical = VerifiedSavedData(propGrpName, "Connection Type Selected", "Connection Type Excluded", msConnTypeAll)
+        If Not isIdentical Then GoTo CannotLoad
+        
+        isIdentical = VerifiedSavedData(propGrpName, "Node Selected", "Node Excluded", msNodeAll)
+        If Not isIdentical Then GoTo CannotLoad
+      
         mbIsLoadLastSaveVerified = True
         mbIsAbleLoadLastSave = True
     ElseIf Not mbIsAbleLoadLastSave Then
@@ -285,34 +241,52 @@ Public Function LoadLastSaveVal()
     Me.MaxMinEnv = genFunc.CBoolArr(ds_sys.prop(propGrpName, "Max Min Env"))
     g_log.WriteLogInDetailMode "Last Save Loaded."
     Exit Function
+    
+CannotLoad:
+    g_log.WriteLogInDetailMode "Last saved data not identical to existing data."
+    ret = -1
 
 ExitFunc:
     LoadLastSaveVal = ret
     g_log.WriteLogInDetailMode "Last Save Cannot be Loaded."
 End Function
 
-Private Function VerifiedSavedData(savedData As Variant, compareData As Variant) As Boolean
+Private Function VerifiedSavedData(propGrpName As String, prop1 As String, prop2 As String, compareData As Variant) As Boolean
     Dim ret As Boolean, i As Long
-    'tempLC = genFunc.CStr_arr(ds_sys.prop(propGrpName, "Load Comb Selected"))
-    If Not genFunc.isInitialised(savedData) Then
-        ret = False
-        GoTo ExitFunction:
+    
+    Dim temp As Variant, temp1 As Variant, temp2 As Variant, count As Long
+    temp1 = ds_sys.propCondense(propGrpName, prop1)
+    temp2 = ds_sys.propCondense(propGrpName, prop2)
+    temp = genFunc.CombineArrays(temp1, temp2)
+    If genFunc.isInitialised(temp) Then
+        temp = genFunc.CStr_arr(temp)
+        temp = genFunc.SortArray(temp)
     Else
-        If savedData(0) = vbNullString Then
-            ret = False
+        If Not genFunc.isInitialised(compareData) Then
+            ret = True
+            GoTo ExitFunction
+            
+        Else
             GoTo ExitFunction
         End If
     End If
-
-    For i = LBound(savedData) To UBound(savedData)
-        If Not genFunc.IsInArr(savedData(i), compareData) Then
-            'msWarningMsg = "Loading last saved data failed. Load Combination '" & tempLC(i) & "' cannot be found in the last saved data."
-            msWarningMsg = "Failed to Load Last Saved Data!"
-            If mbIsShownUF Then MsgBox msWarningMsg
-            ret = False
-            GoTo ExitFunction
-        End If
-    Next i
+    
+    
+    If genFunc.isArraysIdentical(temp, compareData) Then
+        ret = True
+    Else
+        msWarningMsg = "Failed to Load Last Saved Data!"
+        If mbIsShownUF Then MsgBox msWarningMsg
+    End If
+'    For i = LBound(savedData) To UBound(savedData)
+'        If Not genFunc.IsInArr(savedData(i), compareData) Then
+'            'msWarningMsg = "Loading last saved data failed. Load Combination '" & tempLC(i) & "' cannot be found in the last saved data."
+'            msWarningMsg = "Failed to Load Last Saved Data!"
+'            If mbIsShownUF Then MsgBox msWarningMsg
+'            ret = False
+'            GoTo ExitFunction
+'        End If
+'    Next i
     ret = True
 ExitFunction:
     VerifiedSavedData = ret
@@ -501,7 +475,7 @@ End Property
 
 Public Property Let GroupByNodeOrConnType(val As String)
     mGroupByNodeOrConnType = val
-    OnPropertyChanged "mGroupByNodeOrConnType"
+    OnPropertyChanged "GroupByNodeOrConnType"
 End Property
 Public Property Get lc() As String()
     lc = msLcSelect

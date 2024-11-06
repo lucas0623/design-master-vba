@@ -123,7 +123,7 @@ Private Function CheckDataBeforeStart(isMatchSection As Boolean, isLimitKinkAngl
     If isMatchSection And Not mDsSys.prop("WhatOperationCanProcess", "CreateMemberBySection") Then
         CheckDataBeforeStart = -1
     End If
-    If isLimitKinkAngle And Not mDsSys.prop("WhatOperationCanProcess", "CreateMemerByKinkAngle") Then
+    If isLimitKinkAngle And Not mDsSys.prop("WhatOperationCanProcess", "CreateMemberByKinkAngle") Then
         CheckDataBeforeStart = -1
     End If
     If CheckDataBeforeStart = -1 Then mCompleteMsg = "Not Sufficient Data to carry out the process!!"

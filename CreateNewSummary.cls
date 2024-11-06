@@ -33,13 +33,13 @@ Private Sub CreateSummaryTemplate(sheetName As String)
     Dim uniqueSheetName As String
     
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
     
     ' Ensure a unique sheet name
     uniqueSheetName = GetUniqueSheetName(sheetName)
     
     ' Always create a new sheet with a unique name
-    Set ws = wb.Worksheets.Add
+    Set ws = wb.Worksheets.Add(Before:=ActiveSheet)
     ws.name = uniqueSheetName
     
     ' Initialize    the worksheet with the specified content
@@ -85,6 +85,9 @@ Private Sub CreateSummaryTemplate(sheetName As String)
         
         ' Add border to range A4:D5
         .Range("A4:D5").Borders.LineStyle = xlContinuous
+        
+        .Columns("A").Insert
+        .Cells(5, 1) = "rRow"
     End With
     
     ' Set page setup options
@@ -111,13 +114,13 @@ Private Sub CreateSteelMemberDesignSummary(sheetName As String)
     Dim uniqueSheetName As String
 
     ' Reference the current workbook
-    Set wb = ThisWorkbook
+    Set wb = ActiveWorkbook
     
     ' Ensure a unique sheet name
     uniqueSheetName = GetUniqueSheetName(sheetName)
     
     ' Always create a new sheet with a unique name
-    Set ws = wb.Worksheets.Add
+    Set ws = wb.Worksheets.Add(Before:=ActiveSheet)
     ws.name = uniqueSheetName
 
     ' Initialize the worksheet with the specified content
@@ -207,6 +210,9 @@ Private Sub CreateSteelMemberDesignSummary(sheetName As String)
 
         ' Add border to range A4:Y5
         .Range("A4:Y5").Borders.LineStyle = xlContinuous
+        
+        .Columns("A").Insert
+        .Cells(5, 1) = "rRow"
     End With
 
     ' Set page setup options
@@ -245,7 +251,7 @@ End Function
 Private Function WorksheetExists(sheetName As String) As Boolean
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = ThisWorkbook.Sheets(sheetName)
+    Set ws = ActiveWorkbook.Sheets(sheetName)
     WorksheetExists = Not ws Is Nothing
     On Error GoTo 0
 End Function

@@ -97,7 +97,7 @@ End Function
 
 Private Function CheckDataBeforeStart() As Integer
     If Not mDsSys.prop("WhatOperationCanProcess", "CreateMemberBySection") And _
-        Not mDsSys.prop("WhatOperationCanProcess", "CreateMemerByKinkAngle") And _
+        Not mDsSys.prop("WhatOperationCanProcess", "CreateMemberByKinkAngle") And _
         Not mDsSys.prop("WhatOperationCanProcess", "IdentifyRestraint") Then
         CheckDataBeforeStart = -1
     End If

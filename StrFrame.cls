@@ -20,7 +20,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 'this is the variable for the sub frame
-Private mName As String
+Private mName As String ', mSubFrameName As String
 Private pLength As Double
 Private pJtI As New StrJoint, pJtJ As New StrJoint
 Private mOrientationType As EleOrientationType
@@ -83,6 +83,14 @@ End Property
 Public Property Let name(str As String)
     mName = str
 End Property
+
+'Public Property Get subFrameName() As String
+'    subFrameName = mSubFrameName
+'End Property
+'
+'Public Property Let subFrameName(str As String)
+'    mSubFrameName = str
+'End Property
 
 Public Property Get jtI() As StrJoint
     Set jtI = pJtI

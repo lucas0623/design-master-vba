@@ -70,7 +70,7 @@ End Function
 Private Function WriteStrModelToDataFrame() As Integer
 
     If Not df_SAPJtCoor Is Nothing Then Set df_joint = model.GetDataframe(obj_jt, "name", "x", "y", "z", "isRestraint")
-    Set df_ele = model.GetDataframe(obj_frm, "Name", "section", "jtIName", "jtJName", "Length", "EleTypeStr", "localAxis", "subFrameName")
+    Set df_ele = model.GetDataframe(obj_frm, "Name", "section", "jtIName", "jtJName", "Length", "EleTypeStr", "localAxis")
     If Not df_SAPFrameForce Is Nothing Then Set df_force = df_SAPFrameForce
 End Function
 

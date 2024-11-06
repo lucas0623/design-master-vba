@@ -129,6 +129,7 @@ End Function
 Private Function WriteData() As Integer
     Application.StatusBar = "Transforming data for output...."
     g_log.WriteLog "Transforming data for output...."
+    If frmForces.count = 0 Then GoTo ExitFunc
     Dim df As clsDataFrame
     Set df = mModel.GetDataframe_fromColl(frmForces, "nodeName", "connTypeName", "frameSection", "frameName", "frameLength", _
                 "frameJtIName", "frameJtJName", "memberName", "memberIFrameName", "memberJFrameName", _
@@ -149,7 +150,7 @@ Private Function WriteData() As Integer
     g_log.WriteLogWithTime "All data written to the worksheet."
     
     mCompleteMessageAddition = "Total number of data extracted = " & df.CountRows & "."
-    
+ExitFunc:
 End Function
 Private Function SelectUF(method As ConnForceExtractMethod) As IView
     Dim uf As IView

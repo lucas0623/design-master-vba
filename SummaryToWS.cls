@@ -118,7 +118,14 @@ Private Function Initialize(Optional summarySheet As Worksheet) As Integer
     Set designWorksheets = CreateObject("Scripting.Dictionary")
     Set activeOutputCols = CreateObject("Scripting.Dictionary")
     
-    Set dataWS = wsInteract.setWorksheet("WSData", errText:="that contains the target worksheet input/output data")
+    Set dataWS = wsInteract.setWorksheet("WSData", isSkipErr:=True)
+    If dataWS Is Nothing Then
+        Dim oper As New InitializeWorkbook
+        oper.InitializeWSData ("WSData")
+        mTerminateMessageMain = "No WSData Information! Please input target design worksheet input/output data in the 'WSData' Sheet!"
+        GoTo ExitFunc:
+    End If
+    
     If summarySheet Is Nothing Then Set sumWS = ActiveSheet
     Set coll = wsInteract.FindAll(sumWS.rows(1), "targetWS")
     If coll.count = 0 Then

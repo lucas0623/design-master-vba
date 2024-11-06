@@ -46,7 +46,7 @@ Private eventHandlerCollection As New Collection
 Private pHoriSpace As Long, pVertSpace As Long
 Private cTopPos As Double, pBotMargin As Double
 Private pCloseMode As Integer '0 when OK button is pressed, -1 when cancel button is pressed
-
+Private mVersion As String, mReleaseDate As String
 '******************************************************************************************
 '***************************For Customized Title Bar***************************************
 '******************************************************************************************
@@ -56,7 +56,10 @@ Private Sub HandleDragMove(HWND As Long)
 End Sub
 
 
-
+Public Sub Initialize(version As String, releaseDate As String)
+    Label1.caption = "Design Master " & version
+    Label2.caption = "Release Date: " & releaseDate
+End Sub
 
 Private Sub LabelX_Click()
     pCloseMode = -1

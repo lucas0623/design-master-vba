@@ -505,6 +505,7 @@ Property Get matchedConnectionStr() As String
             End If
         Next
     End If
+    If retStr = vbNullString Then retStr = "-"
     matchedConnectionStr = retStr
 End Property
 
