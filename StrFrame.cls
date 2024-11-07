@@ -616,7 +616,7 @@ Public Function FilterCollOfObj(coll As Collection, propName As String, criteria
     For i = 1 To coll.count
 
         key = CStr(CallByName(coll(i), propName, VbGet))
-        If critColl.Exists(key) Then
+        If critColl.exists(key) Then
             coll_filtered.Add coll(i)
         End If
     Next i

@@ -17,6 +17,7 @@ Private genFuncs As New clsGeneralFunctions, wsInteract As New clsWorksheetsInte
 Private collMethod As New LibCollectionMethod, console As New Debugger
 Private DsSys As New DataSheetSystem
 
+
 'Summary
 Private sumWS As Worksheet, columnTags As Object 'a dictionary that contains all column tags data in the summary sheet
 Private targetWsTags As Object 'a dictionary that contains all 'targetWS' Tag in the summary sheet
@@ -89,6 +90,9 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     If Not ret = 0 Then
     End If
     
+    g_log.WriteLog "Summary Worksheet: " & sumWS.name
+    g_log.WriteLog "Row Range: " & fRow_summary & " to " & lRow_summary
+    
     ret = TransferDataFromSummary
     If Not ret = 0 Then
     End If
@@ -99,7 +103,7 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     
     Application.ScreenUpdating = True
     Application.Calculation = xlAutomatic
-    mCompleteMessageAddition = countSucessful & " out of " & countTotal & " number of rows of data are sucessfully transferred."
+    mCompleteMessageAddition = countSucessful & " out of " & countTotal & " number of worksheets' data are sucessfully transferred."
     Exit Function
 ExitFunc:
     Main = -1
@@ -180,8 +184,20 @@ Private Function GetUserInput() As Integer
         SaveUserInput
     Else
         ret = -1
+        GoTo ExitFunc
     End If
     
+    If isOutputPDF Then
+        Dim UI As New clsUIManager
+        myFilePath = UI.GetFolderPath(DsSys.prop("OutputFolderPath", "path"))
+        If myFilePath = vbNullString Then
+            ret = -1
+            GoTo ExitFunc
+        End If
+        DsSys.prop("OutputFolderPath", "path") = myFilePath & "\"
+    End If
+    
+ExitFunc:
     GetUserInput = ret
 End Function
 
@@ -243,24 +259,7 @@ Private Function ReadSummaryDataToDF() As Long
     console.Log df_sum.heads, "df_sum.heads"
     console.Log df_sum.data("1", "1", True), "df_sum.data"
     If df_sum.CountRows = 0 Then GoTo ExitFunc
-    'Read Column Tags Data in the summary
-    'CreateColumnTag
-    'Read targetWS tags data in the summary
-    
-    'Read WS_Data
-    
-    'Get the rows number to be considered.
-'    For i = fRow_summary To lRow_summary
-'        If isBoldedOnly Then
-'            'If sumWS.Cells(i, col_tarWSName(0)).Font.Bold = True & sumWS.rows(i).height > 0 Then coll.Add i
-'        Else
-'            If sumWS.rows(i).height > 0 Then coll.Add i
-'        End If
-'    Next i
-    'If coll.count = 0 Then GoTo ExitFunc:
-    'rows = collMethod.CollToArr1D(coll)
-    'console.Log (rows)
-    
+   
     'get the columns Num of all columns containing tags
     Exit Function
 ExitFunc:
@@ -300,7 +299,7 @@ Function ReadDesignWorksheetIOData() As Long
     
     ' Loop through each non-empty cell found in the first row
     For i = LBound(nonEmptyCells) To UBound(nonEmptyCells)
-        If Not designWorksheets.Exists(nonEmptyCells(i).value) Then
+        If Not designWorksheets.exists(nonEmptyCells(i).value) Then
             Set designWorksheet = ReadSingleDesignWorksheetData(nonEmptyCells(i), refRow)
             designWorksheets.Add designWorksheet.name, designWorksheet
             console.Log designWorksheet.WsInput, designWorksheet.name & " INPUT"
@@ -334,10 +333,10 @@ Private Function FormColumnTags() As Integer
         ' Check if the cell value contains "targetWS"
         If InStr(1, cell.value, "targetWS", vbTextCompare) > 0 Then
             colTag.isTargetWsTag = True
-            If Not targetWsTags.Exists(colTag.name) Then targetWsTags.Add colTag.name, colTag
+            If Not targetWsTags.exists(colTag.name) Then targetWsTags.Add colTag.name, colTag
         Else
             colTag.isOutputTag = True
-            If Not columnTags.Exists(colTag.name) Then columnTags.Add colTag.name, colTag
+            If Not columnTags.exists(colTag.name) Then columnTags.Add colTag.name, colTag
         End If
         colTag.colNumInDF = df_sum.columnNum(colTag.name)
     Next
@@ -406,14 +405,31 @@ End Function
 
 Private Function TransferDataFromSummary() As Integer
     Dim i As Long, j As Long
-    Dim targetWsTag As SummaryWsColTags, targetWs As DesignWsIO
+    Dim targetWsTag As SummaryWsColTags, targetWs As DesignWsIO, wsName As String
     Dim ret As Long, key As Variant
     For i = 1 To df_sum.CountRows
         If Not activeRows(i) Then GoTo NextIteration
+        g_log.WriteLog "Current Row: " & i + fRow_summary
+        
         For Each key In targetWsTags
             Set targetWsTag = targetWsTags(key)
-            Set targetWs = designWorksheets(df_sum.idata(i, targetWsTag.colNumInDF))
+            wsName = df_sum.idata(i, targetWsTag.colNumInDF)
+            'Check if worksheets exists in WSData
+            If wsName = vbNullString Or wsName = "-" Then GoTo NextWorksheet
+            countTotal = countTotal + 1
+            
+            If Not designWorksheets.exists(wsName) Then
+                g_log.WriteLog "  Cannot Find Design Worksheet: '" & wsName & "' Input/Output Data in 'WSData' Sheet."
+                GoTo NextWorksheet
+            End If
+            
+            'transfer data to worksheet
+            g_log.WriteLog "  Design Worksheet: '" & wsName & "'."
+            Set targetWs = designWorksheets(wsName)
             ret = TransferSingleDesignWorksheetData(targetWs, i)
+            If ret = 0 Then countSucessful = countSucessful + 1
+
+NextWorksheet:
         Next key
 NextIteration:
     Next i
@@ -424,7 +440,7 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
     Dim key As Variant
     Dim targetWs As Worksheet
     Dim tag As String
-    
+    Dim val As Variant
     Set WsInputs = targetWsIO.WsInput
     Set WsOutputs = targetWsIO.WsOutput
     
@@ -433,38 +449,54 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
     
     For Each key In WsInputs.keys
         tag = key
-        If columnTags.Exists(tag) Then
-            targetWs.Range(WsInputs(tag)) = df_sum.idata(dfRowNum, columnTags(tag).colNumInDF)
+        If columnTags.exists(tag) Then
+            val = df_sum.idata(dfRowNum, columnTags(tag).colNumInDF)
+            g_log.WriteLog "     Input Tag: '" & key & "'; value: " & val
+            targetWs.Range(WsInputs(tag)) = val
+        Else
+            g_log.WriteLog "     Cannot find Input Tag in the summary sheet: '" & key & "';"
         End If
     Next key
     
     targetWs.Calculate
     For Each key In WsOutputs.keys
         tag = key
-        If columnTags.Exists(tag) Then
-            df_sum.idata(dfRowNum, columnTags(tag).colNumInDF) = targetWs.Range(WsOutputs(tag))
-            If Not activeOutputCols.Exists(tag) Then
+        If columnTags.exists(tag) Then
+            
+            val = targetWs.Range(WsOutputs(tag))
+            g_log.WriteLog "     Output Tag: '" & key & "'; value: " & val
+            df_sum.idata(dfRowNum, columnTags(tag).colNumInDF) = val
+            If Not activeOutputCols.exists(tag) Then
                 activeOutputCols.Add tag, columnTags(tag)
             End If
+        Else
+            g_log.WriteLog "     Cannot find Output Tag in the summary sheet: '" & key & "';"
         End If
     Next key
     
     Dim pdfName As String
     If isOutputPDF Then
+        Dim ret2 As Integer
         strCount = VBA.Format(countPDF, "00")
         If isIncludePrefix Then
             pdfName = targetWs.name & "-" & strCount
         Else
             pdfName = strCount
         End If
-        Create_PDF targetWs, myFilePath, pdfName
+        g_log.WriteLog "     Try printing PDF: '" & pdfName
+        ret2 = Create_PDF(targetWs, myFilePath, pdfName)
+        If ret2 = 0 Then
+            g_log.WriteLog "     Print PDF successful."
+        Else
+            g_log.RaiseWarning "      Could not create PDF file! Record Skipped. Please check file name", failToCreatePDF
+        End If
         countPDF = countPDF + 1
     End If
     
     Exit Function
 ExitFunc:
-    ret = -1
-    g_log.RaiseWarning "No Worksheet '" & targetWsIO.name & "' is Found in the workbook. Skip this row.", NoWorksheetFoundInWorkbook
+    TransferSingleDesignWorksheetData = -1
+    g_log.RaiseWarning "   No Worksheet '" & targetWsIO.name & "' is Found in the workbook. Skip this worksheet.", NoWorksheetFoundInWorkbook
 End Function
 
 Private Function WriteResultToSummary() As Long
@@ -494,7 +526,7 @@ Private Function CreateSequenceArray(startNum As Long, endNum As Long, Optional 
     
     CreateSequenceArray = arr
 End Function
-Private Sub Create_PDF(myWS As Worksheet, myFilePath As String, myFileName As String)
+Private Function Create_PDF(myWS As Worksheet, myFilePath As String, myFileName As String) As Integer
     
 
     Dim strFile As String
@@ -508,10 +540,10 @@ Private Sub Create_PDF(myWS As Worksheet, myFilePath As String, myFileName As St
             IgnorePrintAreas:=False, _
             OpenAfterPublish:=False
     
-    Exit Sub
+    Exit Function
     
 ErrHandler:
-    g_log.RaiseWarning "Could not create PDF file! Record Skipped.", failToCreatePDF
-    Resume Next
-End Sub
+    
+    Create_PDF = -1
+End Function
 

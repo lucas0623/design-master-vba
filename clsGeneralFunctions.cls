@@ -137,7 +137,7 @@ Public Function isArraysIdentical(arr1 As Variant, arr2 As Variant, Optional isC
     
     For i = LBound(arr1) To UBound(arr1)
         key = arr1(i)
-        If dict.Exists(key) Then
+        If dict.exists(key) Then
             dict(key) = dict(key) + 1
         Else
             dict.Add key, 1
@@ -147,7 +147,7 @@ Public Function isArraysIdentical(arr1 As Variant, arr2 As Variant, Optional isC
     ' Compare the count of each element in arr2 to the count in the dictionary
     For i = LBound(arr2) To UBound(arr2)
         key = arr2(i)
-        If dict.Exists(key) Then
+        If dict.exists(key) Then
             dict(key) = dict(key) - 1
             If dict(key) < 0 Then
                 isArraysIdentical = False
@@ -782,7 +782,7 @@ Public Sub AddItemsToDict(dict As Object, key As Variant, val As Variant)
     Dim newArr As Variant
     Dim i As Long
     
-    If dict.Exists(key) Then
+    If dict.exists(key) Then
         dict(key) = AddItemsToArr(dict(key), val)
     Else
         If Not IsObject(val) Then

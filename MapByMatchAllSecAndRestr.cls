@@ -39,7 +39,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     
     
 '    If ConnType.isRestraint = jt.isRestraint And jt.isConn Then
-        If Not DictForMap.Exists(mapSectionsName) Then
+        If Not DictForMap.exists(mapSectionsName) Then
             g_log.WriteLogInDetailMode "  No Joint is mapped for  '" & connType.name & "'"
             GoTo ExitFunction
         End If
@@ -74,7 +74,7 @@ Private Function SetDictForMap() As Object
         If Not jt.isConn Then GoTo NextIteration
         key = jt.SortedConnectedFramesSectionStr(vbNullString, False)
         key = key & CStr(jt.isRestraint)
-        If dict.Exists(key) Then
+        If dict.exists(key) Then
             dict(key).Add jt
         Else
             Dim coll As Collection
