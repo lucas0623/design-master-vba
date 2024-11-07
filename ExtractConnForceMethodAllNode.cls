@@ -49,7 +49,7 @@ Private Function ExtractForce() As Collection
         matchedNodes = cConnType.jointsNameArr
         extractSections = Split(cConnType.extractSections, ",")
         For j = LBound(matchedNodes) To UBound(matchedNodes)
-            If Not dictSelectedNodes.Exists(matchedNodes(j)) Then GoTo Nextj
+            If Not dictSelectedNodes.exists(matchedNodes(j)) Then GoTo Nextj
             Set cJt = mModel.GetStrObject(matchedNodes(j), obj_jt)
             For k = LBound(selectedLc) To UBound(selectedLc)
                 Set frmForcesOfOneLC = New Collection

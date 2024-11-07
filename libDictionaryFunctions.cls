@@ -16,7 +16,7 @@ Public Function GetDuplicateItemsInTwoDicts(dict1 As Object, dict2 As Object) As
     Dim dictRet As Object
     Set dictRet = CreateObject("Scripting.Dictionary")
     For Each key In dict1.keys
-        If dict2.Exists(key) Then
+        If dict2.exists(key) Then
             dictRet.Add key, dict1(key)
         End If
     Next key

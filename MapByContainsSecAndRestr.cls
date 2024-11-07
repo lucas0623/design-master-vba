@@ -51,17 +51,17 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     Set dict2 = CreateObject("Scripting.Dictionary")
     count = uLimit - lLimit + 1
     If count = 1 Then
-        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
     ElseIf count = 2 Then
-        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
-        If DictForMap.Exists(mapSectionsName(uLimit)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
+        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.exists(mapSectionsName(uLimit)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
         Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
     Else
-        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
-        If DictForMap.Exists(mapSectionsName(lLimit + 1)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
+        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.exists(mapSectionsName(lLimit + 1)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
         Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
         For i = lLimit + 2 To uLimit
-            If DictForMap.Exists(mapSectionsName(i)) Then
+            If DictForMap.exists(mapSectionsName(i)) Then
                 Set dict2 = DictForMap(mapSectionsName(i))
                 Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
             Else
@@ -104,8 +104,8 @@ Private Function SetDictForMap() As Object
         Set frms = jt.connectedFrames
         For Each frm In frms
             key = frm.section & CStr(jt.isRestraint)
-            If dict.Exists(key) Then
-                If Not dict(key).Exists(jt.name) Then dict(key).Add jt.name, jt
+            If dict.exists(key) Then
+                If Not dict(key).exists(jt.name) Then dict(key).Add jt.name, jt
             Else
                 Dim dict2 As Object
                 Set dict2 = CreateObject("Scripting.Dictionary")

@@ -115,7 +115,7 @@ Private Function CreateData() As Integer
         If Not jt.isConn Then GoTo NextIteration
         connTypeKey = jt.SortedConnectedFramesSectionStr
 
-        If connTypes.Exists(connTypeKey) Then
+        If connTypes.exists(connTypeKey) Then
             Set connType = mModel.GetStrObject(connTypeKey, obj_connection)
             connType.AddMatchedJoints jt
         Else

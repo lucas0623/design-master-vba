@@ -73,7 +73,7 @@ End Function
 
 ' Helper function to check if a key exists in a dictionary
 Private Function isKeyExist(dict As Object, sKey As String) As Boolean
-    isKeyExist = dict.Exists(sKey)
+    isKeyExist = dict.exists(sKey)
 End Function
 
 ' Method to initialize the class properties
