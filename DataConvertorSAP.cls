@@ -28,6 +28,7 @@ Private ds_sys As DataSheetSystem
 Private df_SAPJtCoor As clsDataFrame, df_SAPJtRestrAssign As clsDataFrame
 Private df_SAPFrameConn As clsDataFrame, df_SAPFrameSection As clsDataFrame, df_SAPFrameLocalAsix As clsDataFrame
 Private df_SAPFrameForce As clsDataFrame
+Private df_SAPLinkSection As clsDataFrame, df_SAPLinkForce As clsDataFrame, df_SAPLinkConn As clsDataFrame
 
 'Data Frame for return
 Private df_ele As clsDataFrame, df_force As clsDataFrame
@@ -71,7 +72,11 @@ Private Function WriteStrModelToDataFrame() As Integer
 
     If Not df_SAPJtCoor Is Nothing Then Set df_joint = model.GetDataframe(obj_jt, "name", "x", "y", "z", "isRestraint")
     Set df_ele = model.GetDataframe(obj_frm, "Name", "section", "jtIName", "jtJName", "Length", "EleTypeStr", "localAxis")
-    If Not df_SAPFrameForce Is Nothing Then Set df_force = df_SAPFrameForce
+    Dim df As clsDataFrame
+    
+    If Not df_SAPFrameForce Is Nothing Then Set df = df_SAPFrameForce
+    If Not df Is Nothing And Not df_SAPLinkForce Is Nothing Then df.AddDataFrame df_SAPLinkForce
+    If Not df Is Nothing Then Set df_force = df
 End Function
 
 Private Function ReadSAPTables(filePath As String) As Integer
@@ -127,6 +132,25 @@ Private Function ReadSAPTables(filePath As String) As Integer
     If ret = -1 Then
         errMsg = "'Frame Force' table missing! Please check the input file"
         GoTo TerminateFunc
+    End If
+    
+    ret = ReadLinkConnectivityTable
+    If ret = -1 Then
+        
+    Else
+        FormLinkObj
+    End If
+    
+    ret = ReadLinkSectionTable
+    If ret = -1 Then
+        
+    Else
+        AssignLinkSection
+    End If
+    
+    ret = ReadLinkForceTable
+    If ret = -1 Then
+        
     End If
     
     ret = ReadJointRestrAssignTable
@@ -247,6 +271,43 @@ Private Function FormFrameObj() As Integer
         ret = model.AddStrObjToColl(frm, obj_frm)
     Next i
 End Function
+
+Private Function FormLinkObj() As Integer
+    Dim i As Long, frm As StrFrame, ret As Integer
+    Dim jtI As StrJoint, jtJ As StrJoint
+    Dim df As clsDataFrame
+    Set df = df_SAPLinkConn
+    For i = 1 To df.CountRows
+        Set jtI = SetJoint(model, df.idata(i, 2))
+        Set jtJ = SetJoint(model, df.idata(i, 3))
+        Set frm = New StrFrame
+        frm.Init df.idata(i, 1), jtI:=jtI, jtJ:=jtJ, Length:=df.idata(i, 4)
+        ret = model.AddStrObjToColl(frm, obj_frm)
+    Next i
+End Function
+
+Private Function ReadLinkConnectivityTable() As Integer
+    Dim ws As Worksheet, ret As Integer
+    Dim i As Long
+    Set ws = setWorksheet("Connectivity - Link", isSkipErr:=True)
+    If ws Is Nothing Then
+        ret = -1
+        GoTo ExitFunc:
+    End If
+    
+    Set df_SAPLinkConn = New clsDataFrame
+    df_SAPLinkConn.Init_ReadWorksheet ws, row_tag:=2, rRow:=3, headTags:=genFunc.CStr_arr(Array("Link", "JointI", "JointJ", "Length"))
+    Set df_SAPLinkConn = ReviseLinkName(df_SAPLinkConn)
+    If df_SAPLinkConn Is Nothing Then
+        ret = -1
+        g_log.WriteLog "Cannot identify some of the data inside the worksheet."
+        GoTo ExitFunc:
+    End If
+    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+ExitFunc:
+    ReadLinkConnectivityTable = ret
+End Function
+
 Private Function ReadFrameSectionTable() As Integer
     Dim ws As Worksheet, ret As Integer
     
@@ -268,10 +329,46 @@ ExitFunc:
     ReadFrameSectionTable = ret
 End Function
 
+Private Function ReadLinkSectionTable() As Integer
+    Dim ws As Worksheet, ret As Integer
+    
+    Set ws = setWorksheet("Link Property Assignments", isSkipErr:=True)
+    If ws Is Nothing Then
+        ret = -1
+        GoTo ExitFunc:
+    End If
+    
+    Set df_SAPLinkSection = New clsDataFrame
+    df_SAPLinkSection.Init_ReadWorksheet ws, row_tag:=2, rRow:=3, headTags:=genFunc.CStr_arr(Array("Link", "LinkProp"))
+    Set df_SAPLinkSection = ReviseLinkName(df_SAPLinkSection)
+    If df_SAPLinkSection Is Nothing Then
+        ret = -1
+        g_log.WriteLog "Cannot identify some of the data inside the worksheet."
+        GoTo ExitFunc:
+    End If
+    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+ExitFunc:
+    ReadLinkSectionTable = ret
+End Function
+
 Private Function AssignFrameSection() As Integer
     Dim i As Long, frm As StrFrame
     Dim df As clsDataFrame
     Set df = df_SAPFrameSection
+    For i = 1 To df.CountRows
+        Set frm = model.GetStrObject(df.idata(i, 1), obj_frm)
+        If frm Is Nothing Then
+            MsgBox "Unexpected Error! Cannot find frame " & df.idata(i, 1) & ". Please check your data file."
+            End
+        End If
+        frm.section = df.idata(i, 2)
+    Next i
+End Function
+
+Private Function AssignLinkSection() As Integer
+    Dim i As Long, frm As StrFrame
+    Dim df As clsDataFrame
+    Set df = df_SAPLinkSection
     For i = 1 To df.CountRows
         Set frm = model.GetStrObject(df.idata(i, 1), obj_frm)
         If frm Is Nothing Then
@@ -353,9 +450,70 @@ ExitFunc:
     ReadFrameForceTable = ret
 End Function
 
-Private Function ReadLinkConnectivityTable() As Integer
+Private Function ReadLinkForceTable() As Integer
+    Dim ws As Worksheet, ret As Integer
+    Dim lRow_SAPforce As Long, rng As Range
+    
+    Const fRow_SAP As Integer = 4
+    Const col_stepDefault As Integer = 6
+    
+    Set ws = setWorksheet("Element Forces - Links", isSkipErr:=True)
+    If ws Is Nothing Then
+        ret = -1
+        GoTo ExitFunc:
+    End If
+    
+    'Modify with 'StepType'
+    With ws
+        If .FilterMode Then
+            .ShowAllData
+        End If
+        If .Cells(fRow_SAP - 2, col_stepDefault) <> "StepType" Then
+            .Columns(col_stepDefault).Insert
+            .Cells(fRow_SAP, col_stepDefault) = "N/A"
+            .Cells(fRow_SAP - 2, col_stepDefault) = "StepType"
+            lRow_SAPforce = wsInteract.FindLastRow(fRow_SAP, 1)
+            Set rng = Range(Cells(fRow_SAP, col_stepDefault), Cells(lRow_SAPforce, col_stepDefault))
+            .Cells(fRow_SAP, col_stepDefault).AutoFill Destination:=rng
+        End If
+    End With
+    
+    Set df_SAPLinkForce = New clsDataFrame
+    df_SAPLinkForce.Init_ReadWorksheet ws, row_tag:=2, rRow:=3, headTags:=genFunc.CStr_arr(Array("Link", "Station", "OutputCase", "StepType", "P", "V2", "V3", "T", "M2", "M3", "LinkElem"))
+    If df_SAPLinkForce Is Nothing Then
+        ret = -1
+        g_log.WriteLog "Cannot identify some of the data inside the worksheet."
+        GoTo ExitFunc:
+    End If
+    'convert the I-end and J-end to absolute value
+    Set df_SAPLinkForce = ReviseLinkName(df_SAPLinkForce)
+    Dim link As StrFrame, i As Long
+    Dim linkName As String
+    For i = 1 To df_SAPLinkForce.CountRows
+        If df_SAPLinkForce.idata(i, 2) = "I-End" Then
+            df_SAPLinkForce.idata(i, 2) = 0
+        Else
+            linkName = df_SAPLinkForce.idata(i, 1)
+            Set link = model.GetStrObject(linkName, obj_frm)
+            df_SAPLinkForce.idata(i, 2) = link.Length
+        End If
+    Next i
 
+    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+ExitFunc:
+    ReadLinkForceTable = ret
 End Function
+
+Private Function ReviseLinkName(df As clsDataFrame) As clsDataFrame
+    Dim reviseDF As New clsDataFrame
+    Dim i As Long
+    Set reviseDF = df
+    For i = 1 To df.CountRows
+        reviseDF.idata(i, 1) = "Link-" & CStr(df.idata(i, 1))
+    Next i
+    Set ReviseLinkName = reviseDF
+End Function
+
 
 Private Function setWorksheet(wsName As String, isSkipErr As Boolean) As Worksheet
     g_log.WriteLog "Try to Read '" & wsName & " ' Table"

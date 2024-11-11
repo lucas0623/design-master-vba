@@ -35,7 +35,7 @@ Sub InitializeDataJoint(sheetName As String)
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
     
     ' Initialize the worksheet headers assuming it's "Data_Joint"
@@ -74,7 +74,7 @@ Sub InitializeDataJointConn(sheetName As String)
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
     
     ' Set up the headers in "Data_JointConn"
@@ -116,7 +116,7 @@ Sub InitializeDataFrame(sheetName As String)
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
     
     ' Set up the headers in "Data_Frame"
@@ -159,7 +159,7 @@ Sub InitializeDataFrameForce(sheetName As String)
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
     
     ' Set up the headers in "Data_FrameForce"
@@ -217,7 +217,7 @@ Sub InitializeDataMemberList(sheetName As String)
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
 
     ' Initialize headers
@@ -262,7 +262,7 @@ Sub InitializeWSData(sheetName As String)
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
 
     ' Initialize headers
@@ -335,7 +335,7 @@ Sub InitializeDefineConnectionType(sheetName As String)
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
 
     ' Initialize headers and formatting
@@ -407,7 +407,7 @@ Sub InitializeDataSystem(sheetName As String)
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
         ws.name = sheetName
     Else
-        Exit Function
+        Exit Sub
     End If
 
     ' Initialize cells with values and formulas

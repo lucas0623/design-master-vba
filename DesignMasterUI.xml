@@ -1,0 +1,114 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui">
+<ribbon>
+<tabs>
+
+<tab id = "first_tab" label = "Design Master">
+	<group id = "group1" label = "Set Up">
+		<button id = "btn_SetupWorkbook" label = "Set Up Workbook" imageMso = "OpenStartPage" onAction = "ProcessRibbon_DM" size = "large"
+		supertip = "Create all necessary sheets for the add-in."/> 
+		<button id = "btn_ImportDesignWS" label = "Import Design Worksheet" imageMso = "ImportWorkbook" onAction = "ProcessRibbon_DM" size = "large"/> 
+		<menu id="menu11" label="Create New Summary Sheet" imageMso="FPTable" size = "large">
+			<button id = "btn_CreateSummaryEmpty" label = "Empty Summary Sheet" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "An empty summary table"/>
+			<button id = "btn_CreateSummaryGeneral" label = "General Purpose" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Contains all tags used in the system"/>
+			<button id = "btn_CreateSummarySteelMember" label = "For Steel Member Design" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Contains tags commonly used in steel member design"/>
+			<button id = "btn_CreateSummarySteelConnection" label = "For Steel Connection Design" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Contains tags commonly used in steel connection design"/>
+			<button id = "btn_CreateSummaryRC" label = "For RC Design" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Contains tags commonly used in RC design"/>
+		</menu>
+	</group>
+
+	<group id = "group2" label = "Import Data">
+		<menu id="menu21" label="Import SAP Data" imageMso="ImportExcel" size = "large">
+			<button id = "btn_ImportSAPDataAndDelete" label = "Import SAP Output .xlsx (Existing Data will be DELETED)" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Please import the SAP Output file (.xlsx), which includes the following tables:&#13;1. Frame Section Assisgnment &#13;2. Frame Connectivity &#13;3. Frame Force and Moment&#13;4. Joints Coordinate&#13;5. Joint Restraints Assignment&#13;6. Frame Local Axes Assignment&#13;&#13;Existing data in the workbook will be deleted."/>
+			<button id = "btn_ImportSAPDataOnly" label = "Import SAP Output .xlsx" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Please import the SAP Output file (.xlsx), which includes the following tables: &#13;1. Frame Section Assisgnment &#13;2. Frame Connectivity &#13;3. Frame Force and Moment&#13;4. Joints Coordinate&#13;5. Joint Restraints Assignment&#13;6. Frame Local Axes Assignment"/>
+		</menu>
+
+	
+		<menu id="menu22" label="Import GSA Data" imageMso="ImportExcel" size = "large">
+			<button id = "btn_ImportGSADataAndDelete" label = "Import GSA Output .csv (Existing Data will be DELETED)" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
+			supertip = "Please import the GSA output file (.csv), which includes the following tables: &#13;1. 'Element'&#13;2. 'Beam and Spring Forces and Moments'&#13;3. 'Joints Coordinate'&#13;&#13;Existing data in the workbook will be deleted."/>
+			<button id = "btn_ImportGSADataOnly" label = "Import GSA Output .csv" imageMso = "HappyFace" onAction = "ProcessRibbon_DM"
+				supertip = "Please import the GSA output file (.csv), which includes the following tables: &#13;1. 'Element' &#13;2. 'Beam and Spring Forces and Moments'&#13;3. 'Joints Coordinate'"/>
+		</menu>
+		
+		
+	</group>
+
+	<group id = "group3A" label = "Process Data">
+			<button id = "btn_ProcessData" label = "Process Model Data" imageMso = "NameCreateFromSelection" onAction = "ProcessRibbon_DM" size = "large"
+			supertip = "Process Data, including creating members and identifying possible connection/restraint in model."/> 
+		<menu id="menu3A1" label="Create Connection Data" imageMso="ShapeConnectorStyleMenu" size = "large">
+			<button id = "btn_GetIdentifiedConnectionData" label = "Get Identified Connection Data" imageMso = "FillDown" onAction = "ProcessRibbon_DM" 
+			supertip = "The Identified Connection Data will be output to a new sheet"/>
+			<button id = "btn_MapConn" label = "Map Connection Types" imageMso = "CreateDiagram" onAction = "ProcessRibbon_DM" 
+			supertip = "Map Connection Data according to User Setting"/>
+		</menu>
+	</group>
+
+	<group id = "group3B" label = "Extract Frame Force">
+		<menu id="menu3B1" label="Extract Frame Force To Summary Table" imageMso="DatasheetColumnLookup" size = "large">
+			<button id = "btn_ExtractFrame_ExtremeCases" label =  "Correspondence Cases" imageMso = "EquationMatrixGallery" onAction="ProcessRibbon_DM"/>
+			<button id = "btn_ExtractFrame_byMemberPosition" label =  "By Position of Member" imageMso = "GroupTableExternalData" onAction="ProcessRibbon_DM"
+			supertip = "Frame Forces at the specified location(s) of the selected member(s) will be extracted for each selected load case(s)/ combination(s). &#13;Permutations will be created for different combinations of Max/Min situations for each Envelope Type Load Combinations"/>
+			<button id = "btn_ExtractFrame_WholeMemberForGraph" label =  "All Forces Along Member (for graph plotting)" imageMso = "GroupTableExternalData" onAction="ProcessRibbon_DM"
+			supertip = "All Frame Forces along the selected members will be extracted. Ordered by Member->Load Combination->Max/Min->Position from I End"/>
+		</menu>
+		<menu id="menu3B2" label="Extract Connection Force To Summary Table" imageMso="DatasheetColumnLookup" size = "large">
+			<button id = "btn_ExtractConnByCorrespondence" label =  "Extract Forces at Connections (Correspondence Cases)" imageMso = "EquationMatrixGallery" onAction="ProcessRibbon_DM"
+			supertip = "Frame Forces (Correspondece cases) at the selected Connection Types will be extracted."/>
+			<button id = "btn_ExtractConnAllNodeAndLc" label =  "Extract All Forces at Connections" imageMso = "EquationMatrixGallery" onAction="ProcessRibbon_DM"
+			supertip = "All Frame Forces at the selected Connection Types will be extracted. Ordered by Connection Types->Node->Load Comb->Max/Min Permutation->Frame"/>
+		</menu>
+	</group>
+
+	<group id = "group4" label = "Design">
+		<button id = "btn_SummaryToDS" label =  "Put Data To Design Worksheets" imageMso = "GroupMoveData" size = "large" onAction="ProcessRibbon_DM"
+		supertip = "The data in the Summary Sheet will be transferred to/ returned from specified Design Worksheet according to the tag setting"/>
+	</group>
+
+	<group id = "group5" label = "Summary Sheet Formatting Tools">
+		<menu id="menu51" label="Formatting Tools" imageMso="ConditionalFormattingDataBarsGallery" size = "large">
+			<button id = "btn_BoldMax" label = "Bold Maximum Rows in Each Group" imageMso = "TableRowSelect" onAction ="ProcessRibbon_DM"/>
+			<button id = "btn_AddBotBorder" label = "Add Bottom Borders in Each Group" imageMso = "BorderBottom" onAction = "ProcessRibbon_DM"/>
+			<button id = "btn_AddBotBorderAtPageBreak" label =  "Add Bottom Border at Page Break" imageMso = "PageBreakInsertOrRemove" onAction="ProcessRibbon_DM"/>
+			<button id = "btn_SetupFooter" label =  "Setup Footer" imageMso = "HeaderOrFooterShow" onAction="ProcessRibbon_DM"/>
+		</menu>
+		<button id = "btn_ClrBotBorder" label = "Clear Bottom Border" imageMso = "Delete" onAction ="ProcessRibbon_DM"/>
+		<button id = "btn_ClrRightBorder" label = "Clear Right Border" imageMso = "Delete" onAction ="ProcessRibbon_DM"/>
+	</group>
+
+	<group id = "group6" label = "Chart" visible="false">
+		<button id = "btn_PlotForceDiagrams" label =  "Plot Force Diagrams (Beta)" imageMso = "ChartLines" size = "large" onAction="ProcessRibbon_DM"/>
+	</group>
+
+	<group id = "group7" label = "ChartSetting" visible="false">
+		<button id = "btn_ChartSetting" label =  "button" imageMso = "HappyFace" onAction="ProcessRibbon_DM"/>
+	</group>
+
+	<group id = "group8" label = "View">
+		<button id = "btn_ViewTag_DesignWS" label = "View Tag of Design Worksheets" imageMso = "GroupOmsView" onAction = "ProcessRibbon_DM"/>
+		<button id = "btn_ViewTag_DataExtraction" label = "View Tag for Data Extraction" imageMso = "GroupOmsView" onAction = "ProcessRibbon_DM"/>
+		<button id = "btn_ViewWorkbookStatus" label =  "View Workbook Status" imageMso = "GroupOmsView" onAction="ProcessRibbon_DM"/>
+	</group>
+	<group id = "group9" label = "Clean Data">
+		<button id = "btn_ClearWsData" label =  "Clear All Data" imageMso = "SheetDelete" onAction="ProcessRibbon_DM"
+		supertip = "All imported data will be deleted."/>
+		<button id = "btn_ClearAllCharts" label =  "Clear All Charts In Activesheet" imageMso = "InkDeleteAllInk" onAction="ProcessRibbon_DM"/>
+	</group>
+
+	<group id = "group10" label = "Info">
+		<button id = "btn_viewLog" label =  "View Log File" imageMso = "HappyFace" size = "large" onAction="ProcessRibbon_DM"/>
+		<button id = "btn_version" label =  "Version" imageMso = "Info" size = "large" onAction="ProcessRibbon_DM"/>
+	</group>
+
+</tab>
+
+</tabs>
+</ribbon>
+</customUI>

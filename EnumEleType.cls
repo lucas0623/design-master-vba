@@ -10,14 +10,14 @@ Attribute VB_Exposed = False
 '@Folder("Structural Model")
 Public Enum EleType
     Beam
-    Link
+    link
 End Enum
 
 Public Function EnumToStr(FrameType As EleType) As String
     Dim ret As String
     Select Case FrameType
         Case Beam: ret = "Beam"
-        Case Link: ret = "Link"
+        Case link: ret = "Link"
     End Select
     EnumToStr = ret
 End Function
@@ -26,7 +26,7 @@ Public Function StrToEnum(str As String) As EleType
     Dim ret As EleType
     Select Case str
         Case "Beam": ret = Beam
-        Case "Link": ret = Link
+        Case "Link": ret = link
     End Select
     StrToEnum = ret
 End Function

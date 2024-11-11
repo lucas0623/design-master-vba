@@ -296,16 +296,25 @@ Public Function FindNextEmptyCell(startRng As Range, Optional lRow As Long = 104
 End Function
 
 Public Function CountNonEmptyCell(rng As Range) As Long
-    'this is not work for merged cells
-    Dim num_const As Long, num_formulas As Long
+    Dim cell As Range
+    Dim count As Long
+    Dim uniqueCells As Collection
+    Set uniqueCells = New Collection
     
     On Error Resume Next
-    num_formulas = rng.Cells.SpecialCells(xlCellTypeFormulas).count
-    num_const = rng.Cells.SpecialCells(xlCellTypeConstants).count
+    
+    For Each cell In rng.Cells
+        If cell.MergeArea.Cells(1, 1).address = cell.address Then
+            ' Only consider the first cell in the merge area
+            If cell.MergeArea.Cells(1, 1).HasFormula Or cell.MergeArea.Cells(1, 1).value <> "" Then
+                uniqueCells.Add cell, cell.address
+            End If
+        End If
+    Next cell
+    
     On Error GoTo 0
-    CountNonEmptyCell = num_const + num_formulas
+    CountNonEmptyCell = uniqueCells.count
 End Function
-
 Public Function GetNonEmptyCellVal(rng As Range) As Variant
     Dim arr As Variant, count As Long
     Dim rng_temp() As Range

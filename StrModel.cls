@@ -73,7 +73,7 @@ Private pID() As Long
 Private Enum idType
     jt = 0
     frm = 1
-    Link = 2
+    link = 2
 End Enum
 Private Sub Class_Initialize()
     pID_joint = 0
