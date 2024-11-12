@@ -603,28 +603,15 @@ WBNotOpenYet:
 End Function
 
 Public Function LastNonEmptyColumn(ws As Worksheet, rowNum As Long) As Long
-    Dim lRow As Long, n As Long, i As Long
-    
-    
-'    'Here we look in Column A
-'    Dim i As Long
-'    For i = LastRow To 1 Step -1
-'        If Not (IsEmpty(Cells(i, 1))) Then Exit For
-'    Next i
-'    LastRow = i
-    n = Application.CountA(ws.rows(rowNum))
-    'n = ws.Rows(rowNum).SpecialCells(xlCellTypeConstants).count
-    i = 0
-    lRow = 1
-    Do While i < n
-        If ws.Cells(rowNum, lRow).Text <> vbNullString Then
-            i = i + 1
-        End If
-        lRow = lRow + 1
-
-    Loop
-    LastNonEmptyColumn = lRow - 1
-
+    Dim lastCol As Range
+    On Error Resume Next ' Handle potential errors, such as no non-empty cells
+    Set lastCol = ws.rows(rowNum).Find(What:="*", LookIn:=xlValues, SearchOrder:=xlByColumns, SearchDirection:=xlPrevious)
+    On Error GoTo 0 ' Reset error handling
+    If Not lastCol Is Nothing Then
+        LastNonEmptyColumn = lastCol.column
+    Else
+        LastNonEmptyColumn = 0 ' Return 0 if no non-empty cells are found
+    End If
 End Function
 
 

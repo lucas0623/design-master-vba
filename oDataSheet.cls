@@ -49,9 +49,12 @@ Public Sub Initialize(wsName As String, tagSelector As Object, ParamArray tags()
     
     
     Dim i As Long
+    
     For i = LBound(tags) To UBound(tags)
+        g_log.WriteLogInDetailMode "Creating Property Tag: " & tags(i)
         CreateProp CStr(tags(i))
         If ret = -1 Then GoTo ExitSub
+        g_log.WriteLogInDetailMode "Create Success."
     Next i
 
 '    Dim rCol As Long
@@ -309,7 +312,7 @@ End Property
 Public Property Get NumOfDataBlocks() As Long
     Dim lColData As Long
     lColData = wsInteract.LastNonEmptyColumn(mWS, iRow + 1)
-    If lColData = 0 Then
+    If lColData = 0 Or lColData < fCol + width Then
         NumOfDataBlocks = 1
     Else
         NumOfDataBlocks = Int((lColData - fCol) / width) + 1
