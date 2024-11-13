@@ -23,12 +23,12 @@ End Type
 
 Private this As VMProp
 
-Private Sub OnPropertyChanged(ByVal name As String)
-    INotifyPropertyChanged_OnPropertyChanged Me, name
+Private Sub OnPropertyChanged(ByVal Name As String)
+    INotifyPropertyChanged_OnPropertyChanged Me, Name
 End Sub
  
-Private Sub INotifyPropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal name As String)
-    Notification.Notify Source, name
+Private Sub INotifyPropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal Name As String)
+    Notification.Notify Source, Name
 End Sub
  
 Private Sub INotifyPropertyChanged_RegisterHandler(ByVal handler As IHandlePropertyChanged)

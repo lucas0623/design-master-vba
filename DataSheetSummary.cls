@@ -165,8 +165,8 @@ Private Sub CreateProp(Text As String, Desc As String)
     mCollProps.Add prop, Text
 End Sub
 
-Public Property Get name() As String
-    name = pWS.name
+Public Property Get Name() As String
+    Name = pWS.Name
 End Property
 
 Public Property Get nodeName() As String

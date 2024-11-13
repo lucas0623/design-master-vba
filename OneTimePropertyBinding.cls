@@ -33,9 +33,9 @@ Private Sub RegisterPropertyChanged(ByVal Source As INotifyPropertyChanged)
     Source.RegisterHandler Me
 End Sub
  
-Private Sub IHandlePropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal name As String)
+Private Sub IHandlePropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal Name As String)
     'update UI when source property change
-    If Source Is this.Source And name = this.SourceProperty And count = 0 Then
+    If Source Is this.Source And Name = this.SourceProperty And count = 0 Then
         VBA.Interaction.CallByName UI, UIProperty, VbLet, VBA.Interaction.CallByName(this.Source, this.SourceProperty, VbGet)
         count = count + 1
     End If

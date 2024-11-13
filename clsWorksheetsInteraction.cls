@@ -97,7 +97,7 @@ Public Function Finds(searchRng As Range, searchArr As Variant, Optional isMustF
     For i = LBound(searchArr) To UBound(searchArr)
         Set rng(i) = searchRng.Find(searchArr(i), LookAt:=xlWhole, MatchCase:=True)
         If rng(i) Is Nothing And isMustFind Then
-            If errText = vbNullString Then errText = "The tag '" & searchArr(i) & "' cannot be found in worksheet '" & searchRng.Worksheet.name & "'"
+            If errText = vbNullString Then errText = "The tag '" & searchArr(i) & "' cannot be found in worksheet '" & searchRng.Worksheet.Name & "'"
             Err.Raise 5001, "Finds", errText
             Exit Function
         End If
@@ -161,7 +161,7 @@ Err_noMatch:
     If isRow Then
         If errText = vbNullString Then
             errMsg = "Cannot locate the column containing the correct data!!! :(" & vbNewLine & _
-                    "Please input '" & label & "' at the column containing the correct data in Row 1 of the '" & ws.name & "' worksheet!!!!"
+                    "Please input '" & label & "' at the column containing the correct data in Row 1 of the '" & ws.Name & "' worksheet!!!!"
         Else
             errMsg = errText
         End If
@@ -170,7 +170,7 @@ Err_noMatch:
     Else:
         If errText = vbNullString Then
             errMsg = "Cannot locate the row containing the correct data!!! :(" & vbNewLine & _
-                    "Please input '" & label & "' at the row containing the correct data in Column 1 of the '" & ws.name & "' worksheet!!!!"
+                    "Please input '" & label & "' at the row containing the correct data in Column 1 of the '" & ws.Name & "' worksheet!!!!"
         Else
             errMsg = errText
         End If
@@ -603,15 +603,28 @@ WBNotOpenYet:
 End Function
 
 Public Function LastNonEmptyColumn(ws As Worksheet, rowNum As Long) As Long
-    Dim lastCol As Range
-    On Error Resume Next ' Handle potential errors, such as no non-empty cells
-    Set lastCol = ws.rows(rowNum).Find(What:="*", LookIn:=xlValues, SearchOrder:=xlByColumns, SearchDirection:=xlPrevious)
-    On Error GoTo 0 ' Reset error handling
-    If Not lastCol Is Nothing Then
-        LastNonEmptyColumn = lastCol.column
-    Else
-        LastNonEmptyColumn = 0 ' Return 0 if no non-empty cells are found
-    End If
+    Dim lRow As Long, n As Long, i As Long
+    
+    
+'    'Here we look in Column A
+'    Dim i As Long
+'    For i = LastRow To 1 Step -1
+'        If Not (IsEmpty(Cells(i, 1))) Then Exit For
+'    Next i
+'    LastRow = i
+    n = Application.CountA(ws.rows(rowNum))
+    'n = ws.Rows(rowNum).SpecialCells(xlCellTypeConstants).count
+    i = 0
+    lRow = 1
+    Do While i < n
+        If ws.Cells(rowNum, lRow).Text <> vbNullString Then
+            i = i + 1
+        End If
+        lRow = lRow + 1
+
+    Loop
+    LastNonEmptyColumn = lRow - 1
+
 End Function
 
 

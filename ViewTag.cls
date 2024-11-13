@@ -223,8 +223,8 @@ Private Function GetSummmarySheetsName() As Variant
 
     'Set ws = ActiveSheet
     'With ActiveSheet
-        If InStr(1, ActiveSheet.name, "Sum") > 0 Then
-            arrL.Add ActiveSheet.name
+        If InStr(1, ActiveSheet.Name, "Sum") > 0 Then
+            arrL.Add ActiveSheet.Name
         End If
     'End With
     With ActiveWorkbook
@@ -232,8 +232,8 @@ Private Function GetSummmarySheetsName() As Variant
         'Set the activesheet as the first item
 
         For i = 1 To ws_count
-            If InStr(1, .Worksheets(i).name, "Sum") > 0 And Not .Worksheets(i).name = ActiveSheet.name Then
-                arrL.Add .Worksheets(i).name
+            If InStr(1, .Worksheets(i).Name, "Sum") > 0 And Not .Worksheets(i).Name = ActiveSheet.Name Then
+                arrL.Add .Worksheets(i).Name
             End If
         Next i
     End With

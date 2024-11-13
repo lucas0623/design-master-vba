@@ -53,7 +53,7 @@ Public Function Main(method As ConnForceExtractMethod) As Integer
     '1. Get Data From Userform
     ret = ShowUFAndGetUserInput(method)
     If Not ret = 0 Then GoTo ExitFunc
-    mDsDesignData.Initialize ws_sum.name
+    mDsDesignData.Initialize ws_sum.Name
 
     '2. Form StrModel Objects
     ret = FormStrObj 'StrObj is formed after the userform due to performance issue
@@ -139,7 +139,7 @@ Private Function WriteData() As Integer
                 "P", "V2", "V3", "T", "M2", "M3")
 
     '5. Write the df to the sheet
-    g_log.WriteLogWithTime "Writing extracted data to the worksheet '" & mDsDesignData.name & "'. Total number of data = " & df.CountRows
+    g_log.WriteLogWithTime "Writing extracted data to the worksheet '" & mDsDesignData.Name & "'. Total number of data = " & df.CountRows
     With mDsDesignData
         .WriteDataframe df, .nodeName, .connType, .section, .eleName, .eleLen, .jtI, .jtJ, .memName, .fFrm, .lFrm, _
                 .pFrm, .nFrm, .memTotalLen, .pos_fromMemJtI_percent, .pos_fromMemJtJ_percent, _

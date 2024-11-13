@@ -111,7 +111,7 @@ Private Function MatchConn() As Integer
         Set oMapMethod = SelectMappingMethod(connType.mapMethod, mModel, connType)
         If Not oMapMethod Is Nothing Then
             oMapMethod.MapConnection connType
-            g_log.WriteLog "  Connection Type '" & connType.name & "' matching completed."
+            g_log.WriteLog "  Connection Type '" & connType.Name & "' matching completed."
         End If
     Next
     
@@ -161,7 +161,7 @@ Private Function SelectMappingMethod(sMapMethod As String, model As StrModel, co
         Set oMapMethod = MapByContainsOnly
     Else
         g_log.RaiseWarning "Cannot regconize connection mapping method for Connection Type '" & _
-                            connType.name & "'. Record Skip", failToRegconizeConnMatchMethod
+                            connType.Name & "'. Record Skip", failToRegconizeConnMatchMethod
         Exit Function
     End If
     

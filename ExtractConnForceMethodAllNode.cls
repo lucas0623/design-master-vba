@@ -49,7 +49,7 @@ Private Function ExtractForce() As Collection
         matchedNodes = cConnType.jointsNameArr
         extractSections = Split(cConnType.extractSections, ",")
         For j = LBound(matchedNodes) To UBound(matchedNodes)
-            If Not dictSelectedNodes.exists(matchedNodes(j)) Then GoTo Nextj
+            If Not dictSelectedNodes.Exists(matchedNodes(j)) Then GoTo Nextj
             Set cJt = mModel.GetStrObject(matchedNodes(j), obj_jt)
             For k = LBound(selectedLc) To UBound(selectedLc)
                 Set frmForcesOfOneLC = New Collection
@@ -75,7 +75,7 @@ Private Function GetFrameForceAtNode(node As StrJoint, frm As StrFrame, lc As St
 'to get the frame forces collection of certain frame at certain node of certain load combination. apply envlope option
      Dim frmForces As New Collection
      'determine which end of the frame is connected to the node
-     If frm.jtI.name = node.name Then
+     If frm.jtI.Name = node.Name Then
         Set frmForces = frm.GetFrameForces_EndI(lc)
     Else
         Set frmForces = frm.GetFrameForces_EndJ(lc)
@@ -116,7 +116,7 @@ Private Function ConvertToFrmForceForConn(jt As StrJoint, connType As StrConnect
         If connType.isFullyPopulate Then
             oFrmForceForConn.Initialize connType, jt, frmForce
         Else
-            currentStr = connType.name & connType.jointsName & frmForce.loadComb & frmForce.stepType
+            currentStr = connType.Name & connType.jointsName & frmForce.loadComb & frmForce.stepType
             
             If count = 0 Then
                 identificationStr = currentStr

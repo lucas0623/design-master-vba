@@ -45,12 +45,12 @@ Private mbIsAbleLoadLastSave As Boolean, msWarningMsg As String
 Private mOperName As String
 Private defaultIsBySec As Boolean
 
-Private Sub OnPropertyChanged(ByVal name As String)
-    INotifyPropertyChanged_OnPropertyChanged Me, name
+Private Sub OnPropertyChanged(ByVal Name As String)
+    INotifyPropertyChanged_OnPropertyChanged Me, Name
 End Sub
  
-Private Sub INotifyPropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal name As String)
-    Notification.Notify Source, name
+Private Sub INotifyPropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal Name As String)
+    Notification.Notify Source, Name
 End Sub
  
 Private Sub INotifyPropertyChanged_RegisterHandler(ByVal handler As IHandlePropertyChanged)
@@ -173,7 +173,7 @@ Public Function LoadLastSaveVal()
         Set cWS = Me.wsSum
     End If
     
-    propGrpName = cWS.name & mOperName
+    propGrpName = cWS.Name & mOperName
     
     g_log.WriteLogInDetailMode "Loading Last Save for the Userform..."
     g_log.WriteLogInDetailMode "propGrpName = " & propGrpName
@@ -295,7 +295,7 @@ Public Sub SaveInput()
     'Save User Input to the
     Dim propGrpName As String
     
-    propGrpName = mWsSum.name & mOperName
+    propGrpName = mWsSum.Name & mOperName
     g_log.WriteLogInDetailMode "Saving User Input..."
     '1.Check if there is existing save. If yes, clear existing data. If no, create a new save
     If ds_sys.isPropGrpExist(propGrpName) Then
@@ -315,7 +315,7 @@ Public Sub SaveInput()
     End If
 
     '2. Write Data
-    ds_sys.prop(propGrpName, "wsName") = mWsSum.name
+    ds_sys.prop(propGrpName, "wsName") = mWsSum.Name
     'ds_sys.prop(propGrpName, "isBySec") = mbIsBySec
     ds_sys.propCondense(propGrpName, "Load Comb Selected") = msLcSelect
     ds_sys.propCondense(propGrpName, "Load Comb Excluded") = msLcExcl
@@ -379,7 +379,7 @@ Private Function GetSummmarySheetsName() As String()
     'Set ws = ActiveSheet
     'With ActiveSheet
         'If InStr(1, ActiveSheet.name, "Sum") > 0 Then
-        arrL.Add ActiveSheet.name
+        arrL.Add ActiveSheet.Name
         'End If
     'End With
     With ActiveWorkbook
@@ -387,8 +387,8 @@ Private Function GetSummmarySheetsName() As String()
         'Set the activesheet as the first item
         
         For i = 1 To ws_count
-            If InStr(1, .Worksheets(i).name, "Sum") > 0 And Not .Worksheets(i).name = ActiveSheet.name Then
-                arrL.Add .Worksheets(i).name
+            If InStr(1, .Worksheets(i).Name, "Sum") > 0 And Not .Worksheets(i).Name = ActiveSheet.Name Then
+                arrL.Add .Worksheets(i).Name
             End If
         Next i
     End With
@@ -409,12 +409,12 @@ End Property
 
 Public Property Set wsSum(ws As Worksheet)
     Set mWsSum = ws
-    Me.wsSumName = ws.name
+    Me.wsSumName = ws.Name
     'OnPropertyChanged "wsSum"
 End Property
 
 Public Property Get wsSumName() As String
-    wsSumName = mWsSum.name
+    wsSumName = mWsSum.Name
 End Property
 
 Public Property Let wsSumName(wsName As String)

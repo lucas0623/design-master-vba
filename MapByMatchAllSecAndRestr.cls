@@ -25,22 +25,22 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     Dim mapSectionsName As String 'Sections Name in the connection Type
     'Dim jtSectionsName As String 'sections name of the connected frames in a jt
     If Not genFunc.isInitialised(connType.mapSections) Then
-        g_log.WriteLogInDetailMode "  No Mapping Section Input for Connection Type '" & connType.name
+        g_log.WriteLogInDetailMode "  No Mapping Section Input for Connection Type '" & connType.Name
         GoTo ExitFunction:
     End If
     mapSectionsName = dataStrOper.SortStr(connType.mapSections, ",")
     
     mapSectionsName = mapSectionsName & CStr(connType.isRestraint)
     
-    g_log.WriteLog "Mapping Connection Type = " & connType.name & "; Method = 'Map By Match All'"
+    g_log.WriteLog "Mapping Connection Type = " & connType.Name & "; Method = 'Map By Match All'"
     g_log.WriteLog "  Sections = " & connType.mapSections
     
     Dim i As Long, j As Long, jt As StrJoint
     
     
 '    If ConnType.isRestraint = jt.isRestraint And jt.isConn Then
-        If Not DictForMap.exists(mapSectionsName) Then
-            g_log.WriteLogInDetailMode "  No Joint is mapped for  '" & connType.name & "'"
+        If Not DictForMap.Exists(mapSectionsName) Then
+            g_log.WriteLogInDetailMode "  No Joint is mapped for  '" & connType.Name & "'"
             GoTo ExitFunction
         End If
 '    Else
@@ -52,7 +52,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
         Set jt = DictForMap(mapSectionsName)(i)
         jt.AddConnectionTypes connType
         connType.AddMatchedJoints jt
-        g_log.WriteLog "  Mapped Joint '" & jt.name & "'"
+        g_log.WriteLog "  Mapped Joint '" & jt.Name & "'"
     Next i
 ExitFunction:
 
@@ -74,7 +74,7 @@ Private Function SetDictForMap() As Object
         If Not jt.isConn Then GoTo NextIteration
         key = jt.SortedConnectedFramesSectionStr(vbNullString, False)
         key = key & CStr(jt.isRestraint)
-        If dict.exists(key) Then
+        If dict.Exists(key) Then
             dict(key).Add jt
         Else
             Dim coll As Collection

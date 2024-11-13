@@ -26,8 +26,9 @@ Private activeRows() As Boolean 'The rows that will be updated/ calculated, whic
 Private activeOutputCols As Object 'a dictionary that contains all active output columns to be written back to the summary sheet after calculation
 Private df_sum As clsDataFrame
 
-Private dataWS As Worksheet
-Private designWorksheets As Object 'a dictionary that contains all designWorksheet input/output data (dictionary of 'DesignWsOP' Object)
+Private dataWS As Worksheet, designGroupWS As Worksheet
+Private designWorksheetsIO As Object 'a dictionary that contains all designWorksheet input/output data (dictionary of 'DesignWsOP' Object)
+Private designWsGroups As Object 'a dictionary that contains all desing Ws Group data
 
 'Userform and Print PDF variables
 Private isBoldedOnly As Boolean, isOutputPDF As Boolean, isIncludePrefix As Boolean
@@ -36,7 +37,6 @@ Private strCount As String, countPDF As Long
 Private countSucessful As Long, countTotal As Long 'count how many rows of data are sucessfully transferred.
 
 Private isMissingKey As Boolean
-'Private macroName As String, objName As String, procName As String
 
 Public Property Get CompleteMessageAddition() As String
     CompleteMessageAddition = mCompleteMessageAddition
@@ -82,6 +82,8 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
         GoTo ExitFunc
     End If
     
+    ret = ReadDesignGroupData
+    
     ret = FormColumnTags
     If Not ret = 0 Then
     End If
@@ -90,7 +92,7 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     If Not ret = 0 Then
     End If
     
-    g_log.WriteLog "Summary Worksheet: " & sumWS.name
+    g_log.WriteLog "Summary Worksheet: " & sumWS.Name
     g_log.WriteLog "Row Range: " & fRow_summary & " to " & lRow_summary
     
     ret = TransferDataFromSummary
@@ -119,7 +121,9 @@ Private Function Initialize(Optional summarySheet As Worksheet) As Integer
     Set DsSys = New DataSheetSystem
     Set columnTags = CreateObject("Scripting.Dictionary")
     Set targetWsTags = CreateObject("Scripting.Dictionary")
-    Set designWorksheets = CreateObject("Scripting.Dictionary")
+    Set designWorksheetsIO = CreateObject("Scripting.Dictionary")
+    Set designWsGroups = CreateObject("Scripting.Dictionary")
+
     Set activeOutputCols = CreateObject("Scripting.Dictionary")
     
     Set dataWS = wsInteract.setWorksheet("WSData", isSkipErr:=True)
@@ -130,6 +134,8 @@ Private Function Initialize(Optional summarySheet As Worksheet) As Integer
         GoTo ExitFunc:
     End If
     
+    Set designGroupWS = wsInteract.setWorksheet("DesignWsGroupData", isSkipErr:=True)
+    
     If summarySheet Is Nothing Then Set sumWS = ActiveSheet
     Set coll = wsInteract.FindAll(sumWS.rows(1), "targetWS")
     If coll.count = 0 Then
@@ -137,17 +143,7 @@ Private Function Initialize(Optional summarySheet As Worksheet) As Integer
         Initialize = -1
         Exit Function
     End If
-    'rng = collMethod.CollToArr1D(coll)
-    For Each item In coll
-        'colTag = CreateColumnTag(item.column, item.Text)
-        'columnTags.Add colTag
-        'columnTags.Add CreateColumnTag(tag.column, tag.Text)
-    Next
-'    ReDim col_tarWSName(LBound(rng) To UBound(rng))
-'    For i = LBound(rng) To UBound(rng)
-'        col_tarWSName(i) = rng(i).column
-'    Next i
-'    console.Log col_tarWSName, "col_tarWSName"
+
     Exit Function
 ExitFunc:
     Initialize = -1
@@ -204,7 +200,7 @@ End Function
 Private Function SaveUserInput() As Integer
     Dim propGrpName As String
     
-    propGrpName = sumWS.name & mOperName
+    propGrpName = sumWS.Name & mOperName
     g_log.WriteLogInDetailMode "Saving User Input..."
     '1.Check if there is existing save. If yes, clear existing data. If no, create a new save
     If DsSys.isPropGrpExist(propGrpName) Then
@@ -218,9 +214,7 @@ Private Function SaveUserInput() As Integer
     End If
 
     '2. Write Data
-    DsSys.prop(propGrpName, "wsName") = sumWS.name
-    'ds_sys.prop(propGrpName, "isBySec") = mbIsBySec
-    'ds_sys.prop(propGrpName, "Rows") = msLcSelect
+    DsSys.prop(propGrpName, "wsName") = sumWS.Name
     DsSys.prop(propGrpName, "isBoldedRows") = isBoldedOnly
     DsSys.prop(propGrpName, "isPrintPDF") = isOutputPDF
     DsSys.prop(propGrpName, "isIncludePrefix") = isIncludePrefix
@@ -230,7 +224,7 @@ Private Function LoadUserInput(cbIsBoldedOnly As msForms.checkbox, _
                                 cbIsOutputPDF As msForms.checkbox, cbIsIncludePrefix As msForms.checkbox) As Integer
     Dim propGrpName As String
     
-    propGrpName = sumWS.name & mOperName
+    propGrpName = sumWS.Name & mOperName
     '1.Check if there is existing save. If yes, try loading the data
     If Not DsSys.isPropGrpExist(propGrpName) Then
         g_log.WriteLogInDetailMode "Cannot find the propGrpName in Data_System Sheet"
@@ -241,7 +235,7 @@ Private Function LoadUserInput(cbIsBoldedOnly As msForms.checkbox, _
     cbIsBoldedOnly.value = DsSys.prop(propGrpName, "isBoldedRows")
     cbIsOutputPDF.value = DsSys.prop(propGrpName, "isPrintPDF")
     cbIsIncludePrefix.value = DsSys.prop(propGrpName, "isIncludePrefix")
-    'tbRngInput.Text = ds_sys.prop(propGrpName, "Rows")
+
 ExitFunc:
     LoadUserInput = ret
 End Function
@@ -299,11 +293,11 @@ Function ReadDesignWorksheetIOData() As Long
     
     ' Loop through each non-empty cell found in the first row
     For i = LBound(nonEmptyCells) To UBound(nonEmptyCells)
-        If Not designWorksheets.exists(nonEmptyCells(i).value) Then
+        If Not designWorksheetsIO.Exists(nonEmptyCells(i).value) Then
             Set designWorksheet = ReadSingleDesignWorksheetData(nonEmptyCells(i), refRow)
-            designWorksheets.Add designWorksheet.name, designWorksheet
-            console.Log designWorksheet.WsInput, designWorksheet.name & " INPUT"
-            console.Log designWorksheet.WsInput, designWorksheet.name & " OUTPUT"
+            designWorksheetsIO.Add designWorksheet.Name, designWorksheet
+            console.Log designWorksheet.WsInput, designWorksheet.Name & " INPUT"
+            console.Log designWorksheet.WsInput, designWorksheet.Name & " OUTPUT"
         Else
             g_log.RaiseWarning "Duplicate Design Worksheet in 'WSData'. Only the first sheet is considered.", duplicateDesignWorksheet 'Raise Warning
         End If
@@ -315,58 +309,6 @@ ExitFunc:
     ReadDesignWorksheetIOData = -1
 End Function
 
-Private Function FormColumnTags() As Integer
-    Dim ws As Worksheet
-    Dim colTag As SummaryWsColTags
-    Dim nonEmptyCells() As Range, cell As Variant
-        
-    Set ws = sumWS
-    nonEmptyCells = wsInteract.FindNonEmptyCell(ws.rows(1))
-    
-    For Each cell In nonEmptyCells
-        Set colTag = New SummaryWsColTags
-        colNum = cell.column
-        
-        ' Initialize the object with name and column number
-        colTag.Initialize CStr(cell.value), colNum
-        
-        ' Check if the cell value contains "targetWS"
-        If InStr(1, cell.value, "targetWS", vbTextCompare) > 0 Then
-            colTag.isTargetWsTag = True
-            If Not targetWsTags.exists(colTag.name) Then targetWsTags.Add colTag.name, colTag
-        Else
-            colTag.isOutputTag = True
-            If Not columnTags.exists(colTag.name) Then columnTags.Add colTag.name, colTag
-        End If
-        colTag.colNumInDF = df_sum.columnNum(colTag.name)
-    Next
-    Exit Function
-End Function
-
-Private Function IdentifyActiveRows() As Integer
-    ReDim activeRows(1 To df_sum.CountRows)
-    Dim i As Long
-    Dim rCol As Long
-    rCol = targetWsTags.Items()(0).colNumInWs
-    If isBoldedOnly Then
-        For i = 1 To UBound(activeRows)
-            If sumWS.Cells(fRow_summary + i - 1, rCol).Font.Bold = True And sumWS.rows(fRow_summary + i - 1).height > 0 Then
-                activeRows(i) = True
-            End If
-        Next i
-    Else
-        For i = 1 To UBound(activeRows)
-            If sumWS.rows(fRow_summary + i - 1).height > 0 Then
-                activeRows(i) = True
-            End If
-        Next i
-    End If
-    
-End Function
-
-'Private Function GetActiveTargetWS() As Integer
-'
-'End Function
 Function ReadSingleDesignWorksheetData(refCell As Range, refRow As Long) As DesignWsIO
     Dim ws As Worksheet
     Dim rCol As Long
@@ -403,9 +345,157 @@ Function ReadSingleDesignWorksheetData(refCell As Range, refRow As Long) As Desi
     Set ReadSingleDesignWorksheetData = designObject
 End Function
 
+Private Function FormColumnTags() As Integer
+    Dim ws As Worksheet
+    Dim colTag As SummaryWsColTags
+    Dim nonEmptyCells() As Range, cell As Variant
+        
+    Set ws = sumWS
+    nonEmptyCells = wsInteract.FindNonEmptyCell(ws.rows(1))
+    
+    For Each cell In nonEmptyCells
+        Set colTag = New SummaryWsColTags
+        colNum = cell.column
+        
+        ' Initialize the object with name and column number
+        colTag.Initialize CStr(cell.value), colNum
+        
+        ' Check if the cell value contains "targetWS"
+        If InStr(1, cell.value, "targetWS", vbTextCompare) > 0 Then
+            colTag.isTargetWsTag = True
+            If Not targetWsTags.Exists(colTag.Name) Then targetWsTags.Add colTag.Name, colTag
+        Else
+            colTag.isOutputTag = True
+            If Not columnTags.Exists(colTag.Name) Then columnTags.Add colTag.Name, colTag
+        End If
+        colTag.colNumInDF = df_sum.columnNum(colTag.Name)
+    Next
+    Exit Function
+End Function
+
+Private Function IdentifyActiveRows() As Integer
+    ReDim activeRows(1 To df_sum.CountRows)
+    Dim i As Long
+    Dim rCol As Long
+    rCol = targetWsTags.Items()(0).colNumInWs
+    If isBoldedOnly Then
+        For i = 1 To UBound(activeRows)
+            If sumWS.Cells(fRow_summary + i - 1, rCol).Font.Bold = True And sumWS.rows(fRow_summary + i - 1).height > 0 Then
+                activeRows(i) = True
+            End If
+        Next i
+    Else
+        For i = 1 To UBound(activeRows)
+            If sumWS.rows(fRow_summary + i - 1).height > 0 Then
+                activeRows(i) = True
+            End If
+        Next i
+    End If
+    
+End Function
+
+'Private Function GetActiveTargetWS() As Integer
+'
+'End Function
+Private Function ReadDesignGroupData() As Long
+    Dim ws As Worksheet
+    
+    Set ws = Worksheets("DesignWsGroupData")
+    Set designWsGroups = CreateObject("Scripting.Dictionary")
+
+    Dim refRow As Long
+    Dim col As Long
+    Dim i As Long
+    Dim nonEmptyCells() As Range
+    Dim designGroup As DesignWsGroup
+    
+    ' Find all non-empty cells in the first row
+    nonEmptyCells = wsInteract.FindNonEmptyCell(ws.rows(1))
+    
+    If Not genFuncs.isInitialised(nonEmptyCells) Then
+        'Write log
+        GoTo ExitFunc
+    End If
+    
+    ' Find the text 'rRow' in the first row
+    refRow = wsInteract.getLocVar(ws, "rRow", False, isMustMatch:=False)
+    If refRow = -1 Then
+        'Write log
+        GoTo ExitFunc
+    End If
+    
+    
+    ' Loop through each non-empty cell found in the first row
+    For i = LBound(nonEmptyCells) To UBound(nonEmptyCells)
+        If Not designWsGroups.Exists(nonEmptyCells(i).value) Then
+            Set designGroup = ReadSingleDesignGroupData(nonEmptyCells(i), refRow)
+            designWsGroups.Add designGroup.Name, designGroup
+            'console.Log designGroup.TagsRelationships.item(1).tagRelation, designGroup.TagsRelationships.item(1).Name
+            'console.Log designGroup.TagsRelationships.item(6).tagRelation, designGroup.TagsRelationships.item(6).Name
+        Else
+            g_log.RaiseWarning "Duplicate Design Worksheet Group in 'DesignWsGroupData'. Only the first sheet is considered.", duplicateDesignWorksheet 'Raise Warning
+        End If
+    Next i
+    Exit Function
+ExitFunc:
+    ReadDesignGroupData = -1
+End Function
+
+Function ReadSingleDesignGroupData(refCell As Range, refRow As Long) As DesignWsGroup
+    Dim ws As Worksheet
+    Dim rCol As Long
+    Dim fRow As Long, lRow As Long, lRowSameGroup As Long
+    Dim key As String
+    Dim value As String
+    Dim designGroup As DesignWsGroup
+    Dim ret As Integer
+    Dim i As Long, j As Long
+    
+    Set ws = refCell.Parent
+    rCol = refCell.column
+    
+    ' Create a new DesignWsIO object using refCell's value as name
+    Set designGroup = New DesignWsGroup
+    designGroup.Initialize refCell.value
+    
+    'Save data in a design worksheet group
+    fRow = refRow + 1
+    lRow = wsInteract.FindLastNonEmptyCell(ws.Columns(rCol)).row
+    
+    Dim wsName As String, designIOtag As String, summaryTag As String
+    Dim tagsRelation As TagsRelationship
+    For i = fRow To lRow
+    
+        If i = lRow Then
+            lRowSameGroup = wsInteract.FindLastRow(i, rCol + 2, ws)
+        Else
+            lRowSameGroup = wsInteract.FindNextNonEmptyCell(ws.Cells(i, rCol)).row - 1
+        End If
+        
+        Set tagsRelation = New TagsRelationship
+        wsName = ws.Cells(i, rCol)
+        tagsRelation.Name = wsName
+        tagsRelation.isPrint = ws.Cells(i, rCol + 1)
+        
+        'Save tag relation data of a worksheet in a design worksheet group
+        For j = i To lRowSameGroup
+            designIOtag = ws.Cells(j, rCol + 2)
+            summaryTag = ws.Cells(j, rCol + 3)
+            ret = tagsRelation.Add(designIOtag, summaryTag)
+            'if ret = -1 then g_log.WriteLog
+        Next j
+        designGroup.AddTagsRelationship tagsRelation
+        i = lRowSameGroup
+    Next i
+    
+    Set ReadSingleDesignGroupData = designGroup
+End Function
+
+
 Private Function TransferDataFromSummary() As Integer
     Dim i As Long, j As Long
     Dim targetWsTag As SummaryWsColTags, targetWs As DesignWsIO, wsName As String
+    Dim designGroup As DesignWsGroup, tagsRelation As TagsRelationship
     Dim ret As Long, key As Variant
     For i = 1 To df_sum.CountRows
         If Not activeRows(i) Then GoTo NextIteration
@@ -418,16 +508,27 @@ Private Function TransferDataFromSummary() As Integer
             If wsName = vbNullString Or wsName = "-" Then GoTo NextWorksheet
             countTotal = countTotal + 1
             
-            If Not designWorksheets.exists(wsName) Then
+            If (Not designWorksheetsIO.Exists(wsName)) And (Not designWsGroups.Exists(wsName)) Then
                 g_log.WriteLog "  Cannot Find Design Worksheet: '" & wsName & "' Input/Output Data in 'WSData' Sheet."
                 GoTo NextWorksheet
             End If
             
             'transfer data to worksheet
-            g_log.WriteLog "  Design Worksheet: '" & wsName & "'."
-            Set targetWs = designWorksheets(wsName)
-            ret = TransferSingleDesignWorksheetData(targetWs, i)
-            If ret = 0 Then countSucessful = countSucessful + 1
+            If designWorksheetsIO.Exists(wsName) Then
+                g_log.WriteLog "  Design Worksheet: '" & wsName & "'."
+                Set targetWs = designWorksheetsIO(wsName)
+                ret = TransferSingleDesignWorksheetData(targetWs, i)
+                If ret = 0 Then countSucessful = countSucessful + 1
+            Else
+                g_log.WriteLog "  Design Worksheets Group: '" & wsName & "'."
+                Set designGroup = designWsGroups(wsName)
+                For Each tagsRelation In designGroup.TagsRelationships
+                    g_log.WriteLog "    Design Worksheets: '" & tagsRelation.Name & "'."
+                    Set targetWs = designWorksheetsIO(tagsRelation.Name)
+                    ret = TransferSingleDesignWorksheetData(targetWs, i, tagsRelation)
+                Next
+                If ret = 0 Then countSucessful = countSucessful + 1
+            End If
 
 NextWorksheet:
         Next key
@@ -435,51 +536,67 @@ NextIteration:
     Next i
 End Function
 
-Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfRowNum As Long) As Integer
+Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfRowNum As Long, _
+                                                Optional tagsRelation As TagsRelationship) As Integer
     Dim WsInputs As Object, WsOutputs As Object
     Dim key As Variant
     Dim targetWs As Worksheet
-    Dim tag As String
+    Dim tag_Ws As String, tag_Summary As String
     Dim val As Variant
     Set WsInputs = targetWsIO.WsInput
     Set WsOutputs = targetWsIO.WsOutput
     
-    Set targetWs = wsInteract.setWorksheet(targetWsIO.name, isSkipErr:=True)
+    Set targetWs = wsInteract.setWorksheet(targetWsIO.Name, isSkipErr:=True)
     If targetWs Is Nothing Then GoTo ExitFunc:
     
     For Each key In WsInputs.keys
-        tag = key
-        If columnTags.exists(tag) Then
-            val = df_sum.idata(dfRowNum, columnTags(tag).colNumInDF)
-            g_log.WriteLog "     Input Tag: '" & key & "'; value: " & val
-            targetWs.Range(WsInputs(tag)) = val
+        tag_Ws = key
+        If tagsRelation Is Nothing Then
+            tag_Summary = key
         Else
-            g_log.WriteLog "     Cannot find Input Tag in the summary sheet: '" & key & "';"
+            tag_Summary = tagsRelation.tagRelation(key)
+        End If
+        'Debug.Assert Not tag = "Shape 2"
+        If columnTags.Exists(tag_Summary) Then
+            val = df_sum.idata(dfRowNum, columnTags(tag_Summary).colNumInDF)
+            g_log.WriteLog "     Input Tag: '" & key & ":" & tag_Summary & "'; value: " & val
+            targetWs.Range(WsInputs(tag_Ws)) = val
+        Else
+            If Not tag_Summary = "-" Then g_log.WriteLog "     Cannot find Input Tag in the summary sheet: '" & tag_Summary & "';"
         End If
     Next key
     
     targetWs.Calculate
     For Each key In WsOutputs.keys
-        tag = key
-        If columnTags.exists(tag) Then
-            
-            val = targetWs.Range(WsOutputs(tag))
-            g_log.WriteLog "     Output Tag: '" & key & "'; value: " & val
-            df_sum.idata(dfRowNum, columnTags(tag).colNumInDF) = val
-            If Not activeOutputCols.exists(tag) Then
-                activeOutputCols.Add tag, columnTags(tag)
+        tag_Ws = key
+        If tagsRelation Is Nothing Then
+            tag_Summary = key
+        Else
+            tag_Summary = tagsRelation.tagRelation(key)
+        End If
+        If columnTags.Exists(tag_Summary) Then
+            val = targetWs.Range(WsOutputs(tag_Ws))
+            g_log.WriteLog "     Output Tag: '" & key & ":" & tag_Summary & "'; value: " & val
+            df_sum.idata(dfRowNum, columnTags(tag_Summary).colNumInDF) = val
+            If Not activeOutputCols.Exists(tag_Summary) Then
+                activeOutputCols.Add tag_Summary, columnTags(tag_Summary)
             End If
         Else
-            g_log.WriteLog "     Cannot find Output Tag in the summary sheet: '" & key & "';"
+            If Not tag_Summary = "-" Then g_log.WriteLog "     Cannot find Output Tag in the summary sheet: '" & tag_Summary & "';"
         End If
     Next key
     
     Dim pdfName As String
     If isOutputPDF Then
+        If Not tagsRelation Is Nothing Then
+            If Not tagsRelation.isPrint Then
+                Exit Function
+            End If
+        End If
         Dim ret2 As Integer
         strCount = VBA.Format(countPDF, "00")
         If isIncludePrefix Then
-            pdfName = targetWs.name & "-" & strCount
+            pdfName = targetWs.Name & "-" & strCount
         Else
             pdfName = strCount
         End If
@@ -496,7 +613,16 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
     Exit Function
 ExitFunc:
     TransferSingleDesignWorksheetData = -1
-    g_log.RaiseWarning "   No Worksheet '" & targetWsIO.name & "' is Found in the workbook. Skip this worksheet.", NoWorksheetFoundInWorkbook
+    g_log.RaiseWarning "   No Worksheet '" & targetWsIO.Name & "' is Found in the workbook. Skip this worksheet.", NoWorksheetFoundInWorkbook
+End Function
+
+Private Function TransferDesignGroupData(designGroup As DesignWsGroup) As Integer
+    Dim tagsRelation As TagsRelationship
+    
+    For Each tagsRelation In designGroup.TagsRelationships
+        
+    Next
+    
 End Function
 
 Private Function WriteResultToSummary() As Long
@@ -528,7 +654,6 @@ Private Function CreateSequenceArray(startNum As Long, endNum As Long, Optional 
 End Function
 Private Function Create_PDF(myWS As Worksheet, myFilePath As String, myFileName As String) As Integer
     
-
     Dim strFile As String
     strFile = myFilePath & "\" & myFileName
 
@@ -546,4 +671,5 @@ ErrHandler:
     
     Create_PDF = -1
 End Function
+
 

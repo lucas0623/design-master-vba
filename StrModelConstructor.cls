@@ -234,7 +234,7 @@ Public Function FormFrmForceObj(Optional sectionFilter As Variant, Optional memb
                 
                 If frm Is Nothing Then
                     Set frm = SetFrame(model, CStr(.idata(i, col_eleID)))
-                ElseIf Not frm.name = CStr(.idata(i, col_eleID)) Then
+                ElseIf Not frm.Name = CStr(.idata(i, col_eleID)) Then
                     Set frm = SetFrame(model, CStr(.idata(i, col_eleID)))
                 End If
                 

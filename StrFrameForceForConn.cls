@@ -25,13 +25,13 @@ Public Sub Initialize(connType As StrConnectionType, node As StrJoint, frmForce 
     Set mFrmForce = frmForce
     
     If outputConnTypeName = "-" Then
-        mConnTypeName = connType.name
+        mConnTypeName = connType.Name
     Else
         mConnTypeName = outputConnTypeName
     End If
     
     If outputNodeName = "-" Then
-        mNodeName = node.name
+        mNodeName = node.Name
     Else
         mNodeName = outputNodeName
     End If

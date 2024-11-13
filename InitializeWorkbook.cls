@@ -19,6 +19,7 @@ Sub Main()
     InitializeWSData "WSData" 'checked
     InitializeDefineConnectionType "Define_ConnectionType"
     InitializeDataSystem "Data_System" 'checked
+    InitializeDesignWsGroupData "DesignWsGroupData"
     MsgBox "Initialization Complete!"
 End Sub
 
@@ -28,12 +29,12 @@ Sub InitializeDataJoint(sheetName As String)
     
     ' Reference the current workbook
     Set wb = ActiveWorkbook
-    Debug.Print "This Workbook Name: " & wb.name
+    Debug.Print "This Workbook Name: " & wb.Name
     
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -72,7 +73,7 @@ Sub InitializeDataJointConn(sheetName As String)
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -114,7 +115,7 @@ Sub InitializeDataFrame(sheetName As String)
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -157,7 +158,7 @@ Sub InitializeDataFrameForce(sheetName As String)
     ' Check if the worksheet exists, if not, create it
     If Not WorksheetExists(sheetName) Then
         Set ws = wb.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -215,7 +216,7 @@ Sub InitializeDataMemberList(sheetName As String)
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -260,7 +261,7 @@ Sub InitializeWSData(sheetName As String)
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -326,6 +327,55 @@ Sub InitializeWSData(sheetName As String)
     End With
 End Sub
 
+
+Sub InitializeDesignWsGroupData(sheetName As String)
+    Dim ws As Worksheet
+    
+    ' Check if the worksheet exists
+    If Not WorksheetExists(sheetName) Then
+        ' Add the worksheet if it does not exist
+        Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
+        ws.Name = sheetName
+    Else
+        Exit Sub
+    End If
+
+    ' Initialize headers
+    With ws
+        .Cells(2, 1).value = "rRow"
+        .Range("B1").value = "Design Group 1"
+        .Range("B1").Font.size = 16
+        .Range("B1").Font.Bold = True
+        
+        ' Set header for Design Worksheet 1
+        .Cells(2, 2).value = "Design Worksheet"
+        .Cells(2, 2).value = "Design Worksheet"
+        .Cells(2, 4).value = "Design Ws IO Tag"
+        .Cells(2, 5).value = "isPrint?"
+        .Cells(2, 6).value = "Header"
+        .Cells(3, 2).value = "Design Worksheet 1"
+        .Cells(3, 4).formula = "=LET(row,2,colA,MATCH(B3,WSData!$1:$1,0)-1,colB,colA+2,VSTACK(GetTableRange(OFFSET(WSData!$A$1,2,colA)),GetTableRange(OFFSET(WSData!$A$1,2,colB))))"
+        .Cells(3, 5).value = "Summary tag1"
+        .Cells(3, 6).value = "Summary tag2"
+        .Cells(3, 7).value = "-"
+
+        ' Merge and center headers across cells
+        .Range("B1:E1").HorizontalAlignment = xlCenterAcrossSelection
+
+        ' Color columns B:I, except for row 2
+        .Range("B3").Interior.Color = RGB(221, 235, 547)
+        .Range("B3:D10").Interior.Color = RGB(221, 235, 547)
+        .Columns("B:E").AutoFit
+        
+        .Columns("A").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("E").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("A").ColumnWidth = 0
+        .Columns("B").ColumnWidth = 20
+        .Columns("D").ColumnWidth = 20
+        .Columns("F").ColumnWidth = 20
+        .Columns("H").ColumnWidth = 20
+    End With
+End Sub
 Sub InitializeDefineConnectionType(sheetName As String)
     Dim ws As Worksheet
 
@@ -333,7 +383,7 @@ Sub InitializeDefineConnectionType(sheetName As String)
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If
@@ -405,7 +455,7 @@ Sub InitializeDataSystem(sheetName As String)
     If Not WorksheetExists(sheetName) Then
         ' Add the worksheet if it does not exist
         Set ws = ActiveWorkbook.Worksheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.count))
-        ws.name = sheetName
+        ws.Name = sheetName
     Else
         Exit Sub
     End If

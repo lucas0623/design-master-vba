@@ -189,7 +189,7 @@ Private Function ReadJointCoorTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadJointCoorTable = ret
 End Function
@@ -221,7 +221,7 @@ Private Function ReadJointRestrAssignTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadJointRestrAssignTable = ret
 End Function
@@ -253,7 +253,7 @@ Private Function ReadFrameConnectivityTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadFrameConnectivityTable = ret
 End Function
@@ -303,7 +303,7 @@ Private Function ReadLinkConnectivityTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadLinkConnectivityTable = ret
 End Function
@@ -324,7 +324,7 @@ Private Function ReadFrameSectionTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadFrameSectionTable = ret
 End Function
@@ -346,7 +346,7 @@ Private Function ReadLinkSectionTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadLinkSectionTable = ret
 End Function
@@ -395,7 +395,7 @@ Private Function ReadFrameLocalAxisTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadFrameLocalAxisTable = ret
 End Function
@@ -445,7 +445,7 @@ Private Function ReadFrameForceTable() As Integer
         g_log.WriteLog "Cannot identify some of the data inside the worksheet."
         GoTo ExitFunc:
     End If
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadFrameForceTable = ret
 End Function
@@ -499,7 +499,7 @@ Private Function ReadLinkForceTable() As Integer
         End If
     Next i
 
-    g_log.WriteLog "'" & ws.name & " ' Table is successfully read."
+    g_log.WriteLog "'" & ws.Name & " ' Table is successfully read."
 ExitFunc:
     ReadLinkForceTable = ret
 End Function

@@ -51,10 +51,10 @@ Sub Main()
     Application.DisplayAlerts = False
     For i = UBound(ws_selected) To 0 Step -1
         wb_target.Sheets(ws_selected(i)).Copy After:=ws_import
-        If InStr(1, ActiveSheet.name, "summary", vbTextCompare) <> 0 Then
-            ws_summary.Add (ActiveSheet.name)
+        If InStr(1, ActiveSheet.Name, "summary", vbTextCompare) <> 0 Then
+            ws_summary.Add (ActiveSheet.Name)
         Else
-            ws_designWS.Add (ActiveSheet.name)
+            ws_designWS.Add (ActiveSheet.Name)
             'Debug.Print ActiveSheet.Name
         End If
         'Debug.Print ActiveWorkbook.name & "," & ActiveSheet.name
@@ -129,8 +129,8 @@ Private Function GetWSList(wb As Workbook) As String()
         End If
         
         For i = 1 To numSheet
-            If Not (ws_WSData_tar.name = .Worksheets(i).name) Then
-                retArr(count) = .Worksheets(i).name
+            If Not (ws_WSData_tar.Name = .Worksheets(i).Name) Then
+                retArr(count) = .Worksheets(i).Name
                 count = count + 1
             End If
         Next i

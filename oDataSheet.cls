@@ -49,12 +49,9 @@ Public Sub Initialize(wsName As String, tagSelector As Object, ParamArray tags()
     
     
     Dim i As Long
-    
     For i = LBound(tags) To UBound(tags)
-        g_log.WriteLogInDetailMode "Creating Property Tag: " & tags(i)
         CreateProp CStr(tags(i))
         If ret = -1 Then GoTo ExitSub
-        g_log.WriteLogInDetailMode "Create Success."
     Next i
 
 '    Dim rCol As Long
@@ -236,7 +233,7 @@ Private Function CreateProp(Text As String, Optional Desc As String) As Integer
     prop.Desc = Desc
     prop.Loc = wsInteract.getLocVar(mWS, Text, True, isMustMatch:=False)
     If prop.Loc = -1 Then
-        MsgBox "cannot find tag '" & Text & "' in worksheet '" & mWS.name & "'!. The macro will be terminate"
+        MsgBox "cannot find tag '" & Text & "' in worksheet '" & mWS.Name & "'!. The macro will be terminate"
         ret = -1
     End If
     mCollProps.Add prop, Text
@@ -312,7 +309,7 @@ End Property
 Public Property Get NumOfDataBlocks() As Long
     Dim lColData As Long
     lColData = wsInteract.LastNonEmptyColumn(mWS, iRow + 1)
-    If lColData = 0 Or lColData < fCol + width Then
+    If lColData = 0 Then
         NumOfDataBlocks = 1
     Else
         NumOfDataBlocks = Int((lColData - fCol) / width) + 1

@@ -67,7 +67,7 @@ Public Function Main(method As FrameForceExtractMethod) As Integer
     '1. Get Data From Userform
     ret = ShowUFAndGetUserInput(method)
     If Not ret = 0 Then GoTo ExitFunc
-    ds_designData.Initialize ws_sum.name
+    ds_designData.Initialize ws_sum.Name
     
     '2. Form StrModel Objects
     Application.StatusBar = "Start forming Structural Model Objects according to user preference...."
@@ -93,7 +93,7 @@ Public Function Main(method As FrameForceExtractMethod) As Integer
                 "P", "V2", "V3", "T", "M2", "M3", "subFrameName")
     
     '5. Write the df to the sheet
-    g_log.WriteLogWithTime "Writing extracted data to the worksheet '" & ds_designData.name & "'. Total number of data = " & df.CountRows
+    g_log.WriteLogWithTime "Writing extracted data to the worksheet '" & ds_designData.Name & "'. Total number of data = " & df.CountRows
     With ds_designData
         .WriteDataframe df, .section, .eleName, .eleLen, .jtI, .jtJ, .memName, .fFrm, .lFrm, _
                 .pFrm, .nFrm, .memTotalLen, .pos_fromMemJtI_percent, .pos_fromMemJtJ_percent, _

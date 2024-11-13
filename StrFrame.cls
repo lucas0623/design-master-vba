@@ -54,9 +54,9 @@ Private mFrameForcesByLC As New Collection ', mFrameForcesByStep As New Collecti
 'Private mFrameForcesByLCnStep As New Collection, mFrameForcesByLCnPos As New Collection, mFrameForcesByStepnPos As New Collection
 'Private mFrameForcesByLCnStepnPos As New Collection
 
-Public Sub Init(name As String, Optional section As String, Optional jtI As StrJoint, _
+Public Sub Init(Name As String, Optional section As String, Optional jtI As StrJoint, _
                 Optional jtJ As StrJoint, Optional ID As Long = 0, Optional Length As Double = 0)
-    mName = name
+    mName = Name
     pSection = section
     If Not jtI Is Nothing Then
         Set pJtI = jtI
@@ -76,11 +76,11 @@ Public Sub Init(name As String, Optional section As String, Optional jtI As StrJ
     
 End Sub
 
-Public Property Get name() As String
-    name = mName
+Public Property Get Name() As String
+    Name = mName
 End Property
 
-Public Property Let name(str As String)
+Public Property Let Name(str As String)
     mName = str
 End Property
 
@@ -99,11 +99,11 @@ Public Property Get jtJ() As StrJoint
     Set jtJ = pJtJ
 End Property
 Public Property Get jtIName() As String
-    jtIName = pJtI.name
+    jtIName = pJtI.Name
 End Property
 
 Public Property Get jtJName() As String
-    jtJName = pJtJ.name
+    jtJName = pJtJ.Name
 End Property
 
 Public Property Get section() As String
@@ -305,7 +305,7 @@ Property Set member(mem As StrMember)
 End Property
 
 Property Get memberName() As String
-    memberName = pMember.name
+    memberName = pMember.Name
 End Property
 
 Property Get frmForces() As Collection
@@ -616,7 +616,7 @@ Public Function FilterCollOfObj(coll As Collection, propName As String, criteria
     For i = 1 To coll.count
 
         key = CStr(CallByName(coll(i), propName, VbGet))
-        If critColl.exists(key) Then
+        If critColl.Exists(key) Then
             coll_filtered.Add coll(i)
         End If
     Next i

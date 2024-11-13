@@ -55,7 +55,7 @@ Private Function GetNodeDict()
     Dim i As Long, jt As StrJoint
     For i = LBound(NodesName) To UBound(NodesName)
         Set jt = mModel.GetStrObject(NodesName(i), obj_jt)
-        NodesColl.Add jt, jt.name
+        NodesColl.Add jt, jt.Name
     Next i
 End Function
 
@@ -130,7 +130,7 @@ Private Function GetFrameForcesCollForOneNode(connType As StrConnectionType, nod
 
     For Each cConnectedFrm In node.connectedFrames
         If genFunc.IsInArr(cConnectedFrm.section, extractSections) Then
-            If cConnectedFrm.jtI.name = node.name Then
+            If cConnectedFrm.jtI.Name = node.Name Then
                 Set frmForces = cConnectedFrm.GetFrameForces_EndI(lc)
                 collMethod.AddColltoColl retFrmForces, frmForces
             Else

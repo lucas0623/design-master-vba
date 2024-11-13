@@ -21,21 +21,21 @@ Private mExtractSections As String
 Private mIsFullyPopulate As String
 Private mEndOffset As Double
 
-Public Sub Init(name As String)
-    mName = name
+Public Sub Init(Name As String)
+    mName = Name
 
 End Sub
 
-Public Sub InitForMapping(name As String, mapJtName As String, mapMethod As String, mapSections As String, isRestraint As Boolean)
-    mName = name
+Public Sub InitForMapping(Name As String, mapJtName As String, mapMethod As String, mapSections As String, isRestraint As Boolean)
+    mName = Name
     mMapJtsName = Replace(mapJtName, "'", "", 1, 1)
     mMapMethod = mapMethod
     mMapSections = Replace(mapSections, "'", "", 1, 1)
     mIsRestraint = isRestraint
 End Sub
 
-Public Sub InitForExtraction(name As String, extractSections As String, isFullyPopulate As Variant, endOffset As Variant, matchedJoint As Collection)
-    mName = name
+Public Sub InitForExtraction(Name As String, extractSections As String, isFullyPopulate As Variant, endOffset As Variant, matchedJoint As Collection)
+    mName = Name
     mExtractSections = Replace(extractSections, "'", "", 1, 1)
     If VarType(isFullyPopulate) = vbBoolean Then
         mIsFullyPopulate = isFullyPopulate
@@ -53,11 +53,11 @@ Public Sub InitForExtraction(name As String, extractSections As String, isFullyP
     
 End Sub
 
-Public Property Get name() As String
-    name = mName
+Public Property Get Name() As String
+    Name = mName
 End Property
 
-Public Property Let name(str As String)
+Public Property Let Name(str As String)
     mName = str
 End Property
 
@@ -74,9 +74,9 @@ Public Property Get jointsName() As String
     If mJoints.count > 0 Then
         For Each jt In mJoints
             If Not retStr = vbNullString Then
-                retStr = retStr & "," & jt.name
+                retStr = retStr & "," & jt.Name
             Else
-                retStr = "'" & jt.name
+                retStr = "'" & jt.Name
             End If
         Next
     End If
@@ -172,7 +172,7 @@ Public Property Let endOffset(ByVal value As Double)
 End Property
 
 Public Function AddMatchedJoints(jt As StrJoint)
-    mJoints.Add jt, jt.name
+    mJoints.Add jt, jt.Name
 End Function
 
 Public Property Get isFullyPopulate() As Boolean
