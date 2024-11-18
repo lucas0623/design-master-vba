@@ -69,7 +69,7 @@ Private Sub IdentifyConn()
     For Each jt In jts
         Set frms = jt.connectedFrames
         If frms Is Nothing Then
-            g_log.WriteLog "Joint ID: " & jt.name & "; Nos. of Connected Frames = 0; isConnection = False"
+            g_log.WriteLog "Joint ID: " & jt.Name & "; Nos. of Connected Frames = 0; isConnection = False"
             GoTo NextIteration
         End If
         If jt.isRestraint Then
@@ -83,7 +83,7 @@ Private Sub IdentifyConn()
         End If
         
         'save restraint result to members properties
-        g_log.WriteLog "Joint ID: " & jt.name & "; Nos. of Connected Frames = " & frms.count & "; isConnection = " & jt.isConn
+        g_log.WriteLog "Joint ID: " & jt.Name & "; Nos. of Connected Frames = " & frms.count & "; isConnection = " & jt.isConn
 NextIteration:
     Next
 

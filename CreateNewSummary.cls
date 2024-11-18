@@ -40,12 +40,12 @@ Private Sub CreateSummaryTemplate(sheetName As String)
     
     ' Always create a new sheet with a unique name
     Set ws = wb.Worksheets.Add(Before:=ActiveSheet)
-    ws.name = uniqueSheetName
+    ws.Name = uniqueSheetName
     
     ' Initialize    the worksheet with the specified content
     With ws
         ' Set the whole sheet font to 'Aptos'
-        .Cells.Font.name = "Aptos Narrow"
+        .Cells.Font.Name = "Aptos Narrow"
         
         ' Set the headers and content
         .Cells(1, 1).value = "targetWS"
@@ -121,12 +121,12 @@ Private Sub CreateSteelMemberDesignSummary(sheetName As String)
     
     ' Always create a new sheet with a unique name
     Set ws = wb.Worksheets.Add(Before:=ActiveSheet)
-    ws.name = uniqueSheetName
+    ws.Name = uniqueSheetName
 
     ' Initialize the worksheet with the specified content
     With ws
         ' Set the whole sheet font to 'Aptos'
-        .Cells.Font.name = "Aptos Narrow"
+        .Cells.Font.Name = "Aptos Narrow"
         
         ' Set the headers and content
         .Cells(1, 1).value = "section"

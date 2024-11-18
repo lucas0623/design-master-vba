@@ -40,7 +40,7 @@ Public Sub Init(frm As StrFrame, station As Double, loadComb As String, _
         pForces(i) = forces(i)
     Next i
     If subFrameName = vbNullString Then
-        mSubFrameName = frm.name
+        mSubFrameName = frm.Name
     Else
         mSubFrameName = subFrameName
     End If
@@ -60,7 +60,7 @@ Public Sub Init2(frm As StrFrame, station As Double, loadComb As String, _
     pForces(4) = M2
     pForces(5) = M3
     If subFrameName = vbNullString Then
-        mSubFrameName = frm.name
+        mSubFrameName = frm.Name
     Else
         mSubFrameName = subFrameName
     End If
@@ -71,7 +71,7 @@ Public Property Get frame() As StrFrame
 End Property
 
 Public Property Get frameName() As String
-    frameName = pFrm.name
+    frameName = pFrm.Name
 End Property
 
 Public Property Get subFrameName() As String
@@ -87,15 +87,15 @@ Public Property Get frameLength() As Double
 End Property
 
 Public Property Get frameJtIName() As String
-    frameJtIName = pFrm.jtI.name
+    frameJtIName = pFrm.jtI.Name
 End Property
 
 Public Property Get frameJtJName() As String
-    frameJtJName = pFrm.jtJ.name
+    frameJtJName = pFrm.jtJ.Name
 End Property
 
 Public Property Get memberName() As String
-    memberName = pFrm.member.name
+    memberName = pFrm.member.Name
 End Property
 
 Public Property Get memberIFrameName() As String
@@ -108,21 +108,21 @@ End Property
 
 Public Property Get preFrameName() As String
     Dim frm As StrFrame
-    Set frm = pFrm.member.preFrame(pFrm.name)
+    Set frm = pFrm.member.preFrame(pFrm.Name)
     If frm Is Nothing Then
         preFrameName = "N/A"
     Else
-        preFrameName = frm.name
+        preFrameName = frm.Name
     End If
 End Property
 
 Public Property Get nextFrameName() As String
     Dim frm As StrFrame
-    Set frm = pFrm.member.nextFrame(pFrm.name)
+    Set frm = pFrm.member.nextFrame(pFrm.Name)
     If frm Is Nothing Then
         nextFrameName = "N/A"
     Else
-        nextFrameName = frm.name
+        nextFrameName = frm.Name
     End If
 End Property
 
@@ -131,7 +131,7 @@ Public Property Get memberTotalLength() As Double
 End Property
 
 Public Property Get pos_fromMemJtI_percent() As Double
-    pos_fromMemJtI_percent = (pFrm.member.RelativeLength(pFrm.name, True) + pStation) / memberTotalLength
+    pos_fromMemJtI_percent = (pFrm.member.RelativeLength(pFrm.Name, True) + pStation) / memberTotalLength
 End Property
 
 Public Property Get pos_fromMemJtJ_percent() As Double
@@ -139,7 +139,7 @@ Public Property Get pos_fromMemJtJ_percent() As Double
 End Property
 
 Public Property Get pos_fromMemJtI() As Double
-    pos_fromMemJtI = pFrm.member.RelativeLength(pFrm.name, True) + pStation
+    pos_fromMemJtI = pFrm.member.RelativeLength(pFrm.Name, True) + pStation
 End Property
 
 Public Property Get pos_fromMemJtJ() As Double

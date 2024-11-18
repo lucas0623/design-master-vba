@@ -249,8 +249,8 @@ Public Property Get links() As Object
     Set links = mLinks
 End Property
 
-Public Property Get member(name As String) As Object
-    Set member = mMembers(name)
+Public Property Get member(Name As String) As Object
+    Set member = mMembers(Name)
  End Property
  
 Public Property Get members() As Object
@@ -461,7 +461,7 @@ Public Function FilterCollOfObj(coll As Collection, propName As String, criteria
     For i = 1 To coll.count
 
         key = CallByName(coll(i), propName, VbGet)
-        If critColl.exists(key) Then
+        If critColl.Exists(key) Then
             coll_filtered.Add coll(i)
         End If
     Next i

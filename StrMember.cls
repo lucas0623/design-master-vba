@@ -37,20 +37,20 @@ Public Enum RestraintType
 End Enum
 
 Public Sub AddFrame(frame As StrFrame, isBefore As Boolean)
-    If isKeyExist(pFrames, frame.name) Then Exit Sub
+    If isKeyExist(pFrames, frame.Name) Then Exit Sub
     
     If isBefore Then
         If pFrames.count = 0 Then
-            pFrames.Add frame, frame.name
+            pFrames.Add frame, frame.Name
         Else
-            pFrames.Add frame, frame.name, Before:=1
+            pFrames.Add frame, frame.Name, Before:=1
         End If
     Else
-        pFrames.Add frame, frame.name
+        pFrames.Add frame, frame.Name
     End If
     
     pTotalLen = pTotalLen + frame.Length
-    If isBefore Then pName = frame.name
+    If isBefore Then pName = frame.Name
 End Sub
 
 
@@ -71,7 +71,7 @@ Public Property Get RelativeLength(frmID As String, isFromI As Boolean) As Doubl
     Dim i As Long
     
     For i = 1 To pFrames.count
-        If pFrames.item(i).name = frmID Then
+        If pFrames.item(i).Name = frmID Then
             If isFromI Then
                 RelativeLength = rLen
             Else
@@ -94,7 +94,7 @@ End Property
 Public Property Get preFrame(frameID As String) As StrFrame
     Dim i As Long
     For i = 1 To pFrames.count
-        If pFrames(i).name = frameID Then
+        If pFrames(i).Name = frameID Then
             If Not i = 1 Then
                 Set preFrame = pFrames(i - 1)
                 Exit Property
@@ -108,7 +108,7 @@ End Property
 Public Property Get nextFrame(frameID As String) As StrFrame
     Dim i As Long
     For i = 1 To pFrames.count
-        If pFrames.item(i).name = frameID Then
+        If pFrames.item(i).Name = frameID Then
             If Not i = pFrames.count Then
                 Set nextFrame = pFrames.item(i + 1)
                 Exit Property
@@ -123,27 +123,27 @@ Public Property Get iFrame() As StrFrame
     Set iFrame = pFrames(1)
 End Property
 Public Property Get iFrameName() As String
-    iFrameName = pFrames(1).name
+    iFrameName = pFrames(1).Name
 End Property
 Public Property Get jFrame() As StrFrame
     Set jFrame = pFrames(pFrames.count)
 End Property
 Public Property Get jFrameName() As String
-    jFrameName = pFrames(pFrames.count).name
+    jFrameName = pFrames(pFrames.count).Name
 End Property
-Public Property Get name() As String
+Public Property Get Name() As String
     If pName = vbNullString Then
         pName = Me.iFrameName
     End If
-    name = pName
+    Name = pName
 End Property
 
 Public Property Get eleList(Optional delimiter As String = ",", Optional prefix As String = "'") As String
     Dim i As Long, str As String
-    str = prefix & pFrames(1).name
+    str = prefix & pFrames(1).Name
     If Not pFrames.count = 1 Then
         For i = 2 To pFrames.count
-            str = str & delimiter & pFrames.item(i).name
+            str = str & delimiter & pFrames.item(i).Name
         Next i
     End If
     eleList = str
@@ -170,7 +170,7 @@ Public Property Get connectedFrames(jt As StrJoint) As Collection
         Set frms2 = CloneCollection(frms1)
         Dim i As Long
         For i = 1 To frms2.count
-            If frms2(i).memberName = Me.name Then frms2.Remove (i)
+            If frms2(i).memberName = Me.Name Then frms2.Remove (i)
         Next i
     End If
     Set connectedFrames = frms2

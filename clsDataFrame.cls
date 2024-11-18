@@ -91,7 +91,7 @@ Sub Init_ReadWorksheet2(Optional ws As Worksheet, Optional col_tag As Long = 1, 
             Set rng_rRow = wsInteraction.FindFirstNonEmptyCell(ws.Columns(col_tag))
             If rng_rRow Is Nothing Then
                 Err.Raise 5001, sProcName, "No Tag is found in the column " & _
-                                wsInteraction.Number2Letter(col_tag) & " of the worksheet '" & ws.name & "'"
+                                wsInteraction.Number2Letter(col_tag) & " of the worksheet '" & ws.Name & "'"
                 'Debug.Print "No rowtag is found in the first column of the " & ws.Name & " Worksheet!!!!"""
                 Exit Sub
             End If
@@ -158,7 +158,7 @@ Sub Init_ReadWorksheet(Optional ws As Worksheet, Optional col_tag As Long = 1, O
             Set rng_rRow = wsInteraction.FindFirstNonEmptyCell(.Columns(col_tag))
             If rng_rRow Is Nothing Then
                 Err.Raise 5001, sProcName, "No Tag is found in the column " & _
-                                wsInteraction.Number2Letter(col_tag) & " of the worksheet '" & .name & "'"
+                                wsInteraction.Number2Letter(col_tag) & " of the worksheet '" & .Name & "'"
                 'Debug.Print "No rowtag is found in the first column of the " & ws.Name & " Worksheet!!!!"""
                 Exit Sub
             End If

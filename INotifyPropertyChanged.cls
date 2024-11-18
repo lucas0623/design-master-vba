@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '@Folder MVVM.Infrastructure
 Option Explicit
-Public Sub OnPropertyChanged(ByVal Source As Object, ByVal name As String)
+Public Sub OnPropertyChanged(ByVal Source As Object, ByVal Name As String)
 End Sub
 Public Sub RegisterHandler(ByVal handler As IHandlePropertyChanged)
 End Sub

@@ -21,7 +21,7 @@ Private Sub IMapConnMethod_Initialize(model As StrModel)
 End Sub
 
 Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As Integer
-    g_log.WriteLog "Mapping Connection Type = " & connType.name & "; Method = 'Map By Specified Joint Name'"
+    g_log.WriteLog "Mapping Connection Type = " & connType.Name & "; Method = 'Map By Specified Joint Name'"
     Dim mapJtsName() As String
     
     Dim dataStrOper As libDataString

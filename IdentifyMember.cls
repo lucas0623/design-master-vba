@@ -88,16 +88,16 @@ Public Function Main(isMatchSection As Boolean, isLimitKinkAngle As Boolean) As 
 '                coll_members.Add cMember, str_member
 '            Loop
 '        Else
-        coll_members.Add cMember, cMember.name
-        If Not mLog Is Nothing Then mLog.WriteLog "Member '" & cMember.name & "' created."
+        coll_members.Add cMember, cMember.Name
+        If Not mLog Is Nothing Then mLog.WriteLog "Member '" & cMember.Name & "' created."
 '        End If
 
         'save the connectivity result back to the frames obj & remove the already matched frames
         'Set coll_matchedFrms = cMember.frames
         With cMember
             For i = 1 To .frames.count
-                Set mModel.GetStrObject(.frames(i).name, obj_frm).member = cMember
-                If isKeyExist(coll_Frms, .frames(i).name) Then coll_Frms.Remove .frames(i).name
+                Set mModel.GetStrObject(.frames(i).Name, obj_frm).member = cMember
+                If isKeyExist(coll_Frms, .frames(i).Name) Then coll_Frms.Remove .frames(i).Name
             Next i
         End With
     Loop
@@ -148,9 +148,9 @@ Private Sub TraceFrame(fFrm As StrFrame, traceDirI As Boolean, _
     
     Set cFrm = fFrm
     
-    If Not isKeyExist(matchedFrms, cFrm.name) Then
+    If Not isKeyExist(matchedFrms, cFrm.Name) Then
         cMember.AddFrame cFrm, traceDirI
-        matchedFrms.Add cFrm, cFrm.name
+        matchedFrms.Add cFrm, cFrm.Name
     End If
     
     Do Until isFound
@@ -168,9 +168,9 @@ Private Sub TraceFrame(fFrm As StrFrame, traceDirI As Boolean, _
         
         For i = 1 To connectedFrms.count
             If IsSameMember(cFrm, connectedFrms(i), traceDirI, isMatchSection, isLimitKinkAngle, limitKinkAngle) Then
-                If Not isKeyExist(matchedFrms, connectedFrms(i).name) Then
+                If Not isKeyExist(matchedFrms, connectedFrms(i).Name) Then
                     cMember.AddFrame connectedFrms(i), traceDirI
-                    matchedFrms.Add connectedFrms(i), connectedFrms(i).name
+                    matchedFrms.Add connectedFrms(i), connectedFrms(i).Name
                     Set cFrm = connectedFrms(i)
                     GoTo NextDo
                 End If
@@ -249,7 +249,7 @@ Private Function CloneCollection(coll) As Object
   
     Dim i As Long
     For i = 1 To coll.count
-        newColl.Add coll(i), coll(i).name
+        newColl.Add coll(i), coll(i).Name
     Next i
     
     Set CloneCollection = newColl

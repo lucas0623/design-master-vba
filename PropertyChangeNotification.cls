@@ -15,10 +15,10 @@ Public Sub AddHandler(ByVal handler As IHandlePropertyChanged)
     Handlers.Add handler
 End Sub
  
-Public Sub Notify(ByVal Source As Object, ByVal name As String)
+Public Sub Notify(ByVal Source As Object, ByVal Name As String)
     Dim handler As IHandlePropertyChanged
     For Each handler In Handlers
-        handler.OnPropertyChanged Source, name
+        handler.OnPropertyChanged Source, Name
     Next
 End Sub
  

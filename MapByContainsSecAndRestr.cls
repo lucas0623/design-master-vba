@@ -32,7 +32,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     
     mapSectionsName = dataStrOper.SplitAndTrimString(connType.mapSections, ",")
     If Not genFunc.isInitialised(mapSectionsName) Then
-        g_log.WriteLogInDetailMode "  No Mapping Section Input for Connection Type '" & connType.name
+        g_log.WriteLogInDetailMode "  No Mapping Section Input for Connection Type '" & connType.Name
         GoTo ExitFunction:
     End If
     
@@ -42,7 +42,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
         mapSectionsName(i) = mapSectionsName(i) & CStr(connType.isRestraint)
     Next i
     
-    g_log.WriteLog "Mapping Connection Type = " & connType.name & "; Method = 'Map By contains sections and restraints'"
+    g_log.WriteLog "Mapping Connection Type = " & connType.Name & "; Method = 'Map By contains sections and restraints'"
     g_log.WriteLog "  Sections = " & connType.mapSections
     
     
@@ -51,17 +51,17 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     Set dict2 = CreateObject("Scripting.Dictionary")
     count = uLimit - lLimit + 1
     If count = 1 Then
-        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
     ElseIf count = 2 Then
-        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
-        If DictForMap.exists(mapSectionsName(uLimit)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
+        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.Exists(mapSectionsName(uLimit)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
         Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
     Else
-        If DictForMap.exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
-        If DictForMap.exists(mapSectionsName(lLimit + 1)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
+        If DictForMap.Exists(mapSectionsName(lLimit)) Then Set DictOfMatched = DictForMap(mapSectionsName(lLimit))
+        If DictForMap.Exists(mapSectionsName(lLimit + 1)) Then Set dict2 = DictForMap(mapSectionsName(uLimit))
         Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
         For i = lLimit + 2 To uLimit
-            If DictForMap.exists(mapSectionsName(i)) Then
+            If DictForMap.Exists(mapSectionsName(i)) Then
                 Set dict2 = DictForMap(mapSectionsName(i))
                 Set DictOfMatched = DictFunc.GetDuplicateItemsInTwoDicts(DictOfMatched, dict2)
             Else
@@ -73,7 +73,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
     End If
     
     If DictOfMatched.count = 0 Then
-       g_log.WriteLogInDetailMode "  No Joint is mapped for  '" & connType.name & "'"
+       g_log.WriteLogInDetailMode "  No Joint is mapped for  '" & connType.Name & "'"
         GoTo ExitFunction
     End If
     
@@ -82,7 +82,7 @@ Private Function IMapConnMethod_MapConnection(connType As StrConnectionType) As 
         Set jt = DictOfMatched(key)
         jt.AddConnectionTypes connType
         connType.AddMatchedJoints jt
-        g_log.WriteLog "  Mapped Joint '" & jt.name & "'"
+        g_log.WriteLog "  Mapped Joint '" & jt.Name & "'"
     Next
             
 ExitFunction:
@@ -104,12 +104,12 @@ Private Function SetDictForMap() As Object
         Set frms = jt.connectedFrames
         For Each frm In frms
             key = frm.section & CStr(jt.isRestraint)
-            If dict.exists(key) Then
-                If Not dict(key).exists(jt.name) Then dict(key).Add jt.name, jt
+            If dict.Exists(key) Then
+                If Not dict(key).Exists(jt.Name) Then dict(key).Add jt.Name, jt
             Else
                 Dim dict2 As Object
                 Set dict2 = CreateObject("Scripting.Dictionary")
-                dict2.Add jt.name, jt
+                dict2.Add jt.Name, jt
                 dict.Add key, dict2
             End If
         Next

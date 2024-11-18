@@ -34,11 +34,11 @@ Public Property Get WsOutput() As Object
 End Property
 
 ' Property for name (Read and Write)
-Public Property Get name() As String
-    name = pName
+Public Property Get Name() As String
+    Name = pName
 End Property
 
-Public Property Let name(value As String)
+Public Property Let Name(value As String)
     pName = value
 End Property
 
@@ -73,12 +73,10 @@ End Function
 
 ' Helper function to check if a key exists in a dictionary
 Private Function isKeyExist(dict As Object, sKey As String) As Boolean
-    isKeyExist = dict.exists(sKey)
+    isKeyExist = dict.Exists(sKey)
 End Function
 
 ' Method to initialize the class properties
-Public Sub Initialize(ByVal name As String)
-    Me.name = name
-    Set pInput = CreateObject("Scripting.Dictionary")
-    Set pOutput = CreateObject("Scripting.Dictionary")
+Public Sub Initialize(ByVal Name As String)
+    Me.Name = Name
 End Sub

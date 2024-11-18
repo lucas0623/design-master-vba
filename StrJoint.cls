@@ -64,8 +64,8 @@ Private mJtLoads As New Collection
 'Private pDistLoadPat As String
 'Private pDistLoad(6) As Double
 
-Public Sub Init(name As String, Optional x As Double = 0, Optional y As Double = 0, Optional z As Double = 0, Optional ID As Long = 0)
-    mName = name
+Public Sub Init(Name As String, Optional x As Double = 0, Optional y As Double = 0, Optional z As Double = 0, Optional ID As Long = 0)
+    mName = Name
     mx = x
     my = y
     mz = z
@@ -145,11 +145,11 @@ Public Sub Init_all()
 
 End Sub
 
-Public Property Get name() As String
-    name = mName
+Public Property Get Name() As String
+    Name = mName
 End Property
 
-Public Property Let name(str As String)
+Public Property Let Name(str As String)
     mName = str
 End Property
 
@@ -375,8 +375,8 @@ Property Get connectedFrames_JtI() As Object
     
     If Not mConnectedFrms.count = 0 Then
         For i = 1 To mConnectedFrms.count
-            If mConnectedFrms(i).jtI.name = mName Then
-                frames_jtI.Add mConnectedFrms(i), mConnectedFrms(i).name
+            If mConnectedFrms(i).jtI.Name = mName Then
+                frames_jtI.Add mConnectedFrms(i), mConnectedFrms(i).Name
             End If
         Next i
     End If
@@ -390,8 +390,8 @@ Property Get connectedFrames_JtJ() As Object
     
     If Not mConnectedFrms.count = 0 Then
         For i = 1 To mConnectedFrms.count
-            If mConnectedFrms(i).jtJ.name = mName Then
-                frames_jtJ.Add mConnectedFrms(i), mConnectedFrms(i).name
+            If mConnectedFrms(i).jtJ.Name = mName Then
+                frames_jtJ.Add mConnectedFrms(i), mConnectedFrms(i).Name
             End If
         Next i
     End If
@@ -399,7 +399,7 @@ Property Get connectedFrames_JtJ() As Object
 End Property
 
 Sub AddConnectedFrm(frm As StrFrame)
-    mConnectedFrms.Add frm, frm.name
+    mConnectedFrms.Add frm, frm.Name
 End Sub
 
 Property Get connectedFramesStr(Optional prefix As String = "'") As String
@@ -407,9 +407,9 @@ Property Get connectedFramesStr(Optional prefix As String = "'") As String
     If mConnectedFrms.count > 0 Then
         For Each frm In mConnectedFrms
             If Not retStr = vbNullString Then
-                retStr = retStr & "," & frm.name
+                retStr = retStr & "," & frm.Name
             Else
-                retStr = prefix & frm.name
+                retStr = prefix & frm.Name
             End If
         Next
     End If
@@ -485,7 +485,7 @@ Property Get connectedMembersStr(Optional prefix As String = "'") As String
 End Property
 
 Public Function AddConnectionTypes(conn As StrConnectionType)
-    mConnectionsTypes.Add conn, conn.name
+    mConnectionsTypes.Add conn, conn.Name
 End Function
 
 Property Get connectionsTypes() As Object
@@ -499,9 +499,9 @@ Property Get matchedConnectionStr() As String
     If mConnectionsTypes.count > 0 Then
         For Each conn In mConnectionsTypes
             If Not retStr = vbNullString Then
-                retStr = retStr & "," & conn.name
+                retStr = retStr & "," & conn.Name
             Else
-                retStr = "'" & conn.name
+                retStr = "'" & conn.Name
             End If
         Next
     End If

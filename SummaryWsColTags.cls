@@ -19,11 +19,11 @@ Private pIsOutputTag As Boolean
 Private pIsTargetWsTag As Boolean
 
 ' Property for name
-Public Property Get name() As String
-    name = pName
+Public Property Get Name() As String
+    Name = pName
 End Property
 
-Public Property Let name(value As String)
+Public Property Let Name(value As String)
     pName = value
 End Property
 
@@ -64,7 +64,7 @@ Public Property Let isTargetWsTag(value As Boolean)
 End Property
 
 ' Method to Initialize the class properties
-Public Sub Initialize(ByVal name As String, ByVal colNumInWs As Long)
-    Me.name = name
+Public Sub Initialize(ByVal Name As String, ByVal colNumInWs As Long)
+    Me.Name = Name
     Me.colNumInWs = colNumInWs
 End Sub

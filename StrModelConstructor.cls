@@ -234,7 +234,7 @@ Public Function FormFrmForceObj(Optional sectionFilter As Variant, Optional memb
                 
                 If frm Is Nothing Then
                     Set frm = SetFrame(model, CStr(.idata(i, col_eleID)))
-                ElseIf Not frm.name = CStr(.idata(i, col_eleID)) Then
+                ElseIf Not frm.Name = CStr(.idata(i, col_eleID)) Then
                     Set frm = SetFrame(model, CStr(.idata(i, col_eleID)))
                 End If
                 
@@ -386,7 +386,7 @@ Public Function FormConnTypeObjForForceExtract() As Integer
             Set connType = New StrConnectionType
             Set coll = New Collection
             matchedJoint = df.idata(i, col_matchedJoint)
-            If Not matchedJoint = vbNullString Or Not matchedJoint = "-" Then
+            If Not (matchedJoint = vbNullString Or matchedJoint = "-") Then
                 jtNames = SplitAndTrimString(matchedJoint, ",")
                 For j = LBound(jtNames) To UBound(jtNames)
                     coll.Add SetJoint(mModel, jtNames(j))

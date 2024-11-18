@@ -32,9 +32,9 @@ Private Sub RegisterPropertyChanged(ByVal Source As INotifyPropertyChanged)
     Source.RegisterHandler Me
 End Sub
  
-Private Sub IHandlePropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal name As String)
+Private Sub IHandlePropertyChanged_OnPropertyChanged(ByVal Source As Object, ByVal Name As String)
     'update UI when source property change
-    If Source Is this.Source And name = this.SourceProperty Then
+    If Source Is this.Source And Name = this.SourceProperty Then
         UI.value = VBA.Interaction.CallByName(this.Source, this.SourceProperty, VbGet)
     End If
 End Sub

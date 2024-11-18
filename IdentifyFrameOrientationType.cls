@@ -73,7 +73,7 @@ Private Sub ClassifyFrameType()
     For Each frm In frms
         frmType = frmTypeClassifier.Classify(frm)
         frm.orientationType = frmType
-        g_log.WriteLog "Frame '" & frm.name & "' is '" & frm.OrientationTypeStr & "' 1D element."
+        g_log.WriteLog "Frame '" & frm.Name & "' is '" & frm.OrientationTypeStr & "' 1D element."
     Next
     
 End Sub

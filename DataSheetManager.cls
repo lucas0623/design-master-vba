@@ -87,7 +87,6 @@ Private Sub InitDataSheetJointConnectivity()
 End Sub
 
 Private Sub InitDataSheetConnectionType()
-    g_log.WriteLogInDetailMode "Initializing Data Sheet 'Define_ConnectionType'"
     If isKeyExist(mDataSheets, DSName(ConnectionType)) Then Exit Sub
     Dim dataSheet As oDataSheet
     Set dataSheet = New oDataSheet
