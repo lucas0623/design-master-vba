@@ -78,11 +78,15 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     
     ret = ReadDesignWorksheetIOData
     If Not ret = 0 Then
-        g_log.WriteLog "Fail to read WS Input/Output data. Exit Operation."
+        g_log.WriteLog "Fail to read worksheet Input/Output data. Exit Operation."
         GoTo ExitFunc
     End If
     
     ret = ReadDesignGroupData
+    If Not ret = 0 Then
+        g_log.WriteLog "Fail to read Design Worksheet Group data. Exit Operation."
+        GoTo ExitFunc
+    End If
     
     ret = FormColumnTags
     If Not ret = 0 Then
@@ -250,8 +254,8 @@ Private Function ReadSummaryDataToDF() As Long
     'Read worksheet to dataframe
     Set df_sum = New clsDataFrame
     df_sum.Init_ReadWorksheet sumWS, rRow:=fRow_summary - 1, lRow:=lRow_summary
-    console.Log df_sum.heads, "df_sum.heads"
-    console.Log df_sum.data("1", "1", True), "df_sum.data"
+    'console.Log df_sum.heads, "df_sum.heads"
+    'console.Log df_sum.data("1", "1", True), "df_sum.data"
     If df_sum.CountRows = 0 Then GoTo ExitFunc
    
     'get the columns Num of all columns containing tags
@@ -268,7 +272,7 @@ Function ReadDesignWorksheetIOData() As Long
     Dim nonEmptyCells() As Range
     Dim designWorksheet As DesignWsIO
     
-    
+    g_log.WriteLog "Start reading design worksheets' Input/Output Data..."
     Set ws = wsInteract.setWorksheet("WSData", isSkipErr:=True)
     If ws Is Nothing Then
         mTerminateMessageMain = "Error: Cannot find the sheet 'WSData' that contains the information of input/output data for all design worksheets."
@@ -294,10 +298,12 @@ Function ReadDesignWorksheetIOData() As Long
     ' Loop through each non-empty cell found in the first row
     For i = LBound(nonEmptyCells) To UBound(nonEmptyCells)
         If Not designWorksheetsIO.Exists(nonEmptyCells(i).value) Then
+            g_log.WriteLog "   Reading worksheet '" & nonEmptyCells(i).value & "' input/output data"
             Set designWorksheet = ReadSingleDesignWorksheetData(nonEmptyCells(i), refRow)
+            
             designWorksheetsIO.Add designWorksheet.Name, designWorksheet
-            console.Log designWorksheet.WsInput, designWorksheet.Name & " INPUT"
-            console.Log designWorksheet.WsInput, designWorksheet.Name & " OUTPUT"
+            'console.Log designWorksheet.WsInput, designWorksheet.Name & " INPUT"
+            'console.Log designWorksheet.WsInput, designWorksheet.Name & " OUTPUT"
         Else
             g_log.RaiseWarning "Duplicate Design Worksheet in 'WSData'. Only the first sheet is considered.", duplicateDesignWorksheet 'Raise Warning
         End If
@@ -317,7 +323,7 @@ Function ReadSingleDesignWorksheetData(refCell As Range, refRow As Long) As Desi
     Dim value As String
     Dim designObject As DesignWsIO
     Dim ret As String
-    
+    Dim tempStr As String
     Set ws = refCell.Parent
     rCol = refCell.column
     
@@ -332,14 +338,47 @@ Function ReadSingleDesignWorksheetData(refCell As Range, refRow As Long) As Desi
     For i = fRow To lRow
         key = ws.Cells(i, rCol).value
         value = ws.Cells(i, rCol + 1).value
+        
+        If value = vbNullString Then GoTo NextIteration1
+        If Not wsInteract.IsCellAddress(value) Then
+            g_log.RaiseWarning "Cell Address invalid. Worksheet Name: " & designObject.Name & ". Input: " & key & ".", InvalidAddress
+            GoTo NextIteration1
+        End If
+        tempStr = wsInteract.GetAddressWorksheetName(value)
+        If Not tempStr = vbNullString And Not tempStr = designObject.Name Then
+            g_log.RaiseWarning "Cell Address invalid: Worksheet Name Not Match. Worksheet Name: " & designObject.Name & ". Input: " & key & ".", InvalidAddress
+            GoTo NextIteration1
+        End If
+        
         ret = designObject.AddInput(key, value)
+        If Not ret = 0 Then g_log.RaiseWarning "Duplicate Input Name. Worksheet Name: " & designObject.Name & ". Input: " & key & ".", DuplicateIOTagName
+        g_log.WriteLog "   Input: '" & key & "' address sucessfully read"
+NextIteration1:
     Next i
     
     ' Read and set Output values
-    For i = refRow To lRow
+    lRow = wsInteract.FindLastRow(refRow, rCol + 2, ws)
+    For i = fRow To lRow
         key = ws.Cells(i, rCol + 2).value
         value = ws.Cells(i, rCol + 3).value
+        
+        If value = vbNullString Then GoTo NextIteration2
+        
+        If Not wsInteract.IsCellAddress(value) Then
+            g_log.RaiseWarning "Cell Address invalid. Worksheet Name: " & designObject.Name & ". Output: " & key & ".", InvalidAddress
+            GoTo NextIteration2
+        End If
+        
+        tempStr = wsInteract.GetAddressWorksheetName(value)
+        If Not tempStr = vbNullString And Not tempStr = designObject.Name Then
+            g_log.RaiseWarning "Cell Address invalid: Worksheet Name Not Match. Worksheet Name: " & designObject.Name & ". Input: " & key & ".", InvalidAddress
+            GoTo NextIteration1
+        End If
+        
         ret = designObject.AddOutput(key, value)
+        If Not ret = 0 Then g_log.RaiseWarning "Duplicate Output Name. Worksheet Name: " & designObject.Name & ". Output: " & key & ".", DuplicateIOTagName
+        g_log.WriteLog "   Output: '" & key & "' address sucessfully read"
+NextIteration2:
     Next i
     
     Set ReadSingleDesignWorksheetData = designObject
@@ -410,6 +449,7 @@ Private Function ReadDesignGroupData() As Long
     Dim designGroup As DesignWsGroup
     
     ' Find all non-empty cells in the first row
+    g_log.WriteLog "Start reading design worksheets group Input/Output Data..."
     nonEmptyCells = wsInteract.FindNonEmptyCell(ws.rows(1))
     
     If Not genFuncs.isInitialised(nonEmptyCells) Then
@@ -428,7 +468,13 @@ Private Function ReadDesignGroupData() As Long
     ' Loop through each non-empty cell found in the first row
     For i = LBound(nonEmptyCells) To UBound(nonEmptyCells)
         If Not designWsGroups.Exists(nonEmptyCells(i).value) Then
+            g_log.WriteLog "   Reading worksheet group'" & nonEmptyCells(i).value & "' data"
             Set designGroup = ReadSingleDesignGroupData(nonEmptyCells(i), refRow)
+            If designGroup Is Nothing Then
+                mTerminateMessageMain = "Check 'DesignWsGroupData' input! Some errors are found in the cells. The macro will be terminated."
+                GoTo ExitFunc
+            End If
+            
             designWsGroups.Add designGroup.Name, designGroup
             'console.Log designGroup.TagsRelationships.item(1).tagRelation, designGroup.TagsRelationships.item(1).Name
             'console.Log designGroup.TagsRelationships.item(6).tagRelation, designGroup.TagsRelationships.item(6).Name
@@ -473,16 +519,20 @@ Function ReadSingleDesignGroupData(refCell As Range, refRow As Long) As DesignWs
         End If
         
         Set tagsRelation = New TagsRelationship
+        
         wsName = ws.Cells(i, rCol)
+        g_log.WriteLog "      Reading worksheet '" & wsName & "' data"
         tagsRelation.Name = wsName
         tagsRelation.isPrint = ws.Cells(i, rCol + 1)
         
         'Save tag relation data of a worksheet in a design worksheet group
         For j = i To lRowSameGroup
+            If VarType(ws.Cells(j, rCol + 2)) = vbError Then Exit Function
+                
             designIOtag = ws.Cells(j, rCol + 2)
             summaryTag = ws.Cells(j, rCol + 3)
             ret = tagsRelation.Add(designIOtag, summaryTag)
-            'if ret = -1 then g_log.WriteLog
+            
         Next j
         designGroup.AddTagsRelationship tagsRelation
         i = lRowSameGroup
@@ -520,10 +570,13 @@ Private Function TransferDataFromSummary() As Integer
                 ret = TransferSingleDesignWorksheetData(targetWs, i)
                 If ret = 0 Then countSucessful = countSucessful + 1
             Else
+                Debug.Assert Not wsName = "FinPlatesBolts"
                 g_log.WriteLog "  Design Worksheets Group: '" & wsName & "'."
                 Set designGroup = designWsGroups(wsName)
                 For Each tagsRelation In designGroup.TagsRelationships
                     g_log.WriteLog "    Design Worksheets: '" & tagsRelation.Name & "'."
+                    'Debug.Assert Not (tagsRelation.Name = "Calculation Title" And wsName = "FinPlatesBolts")
+                    Debug.Assert Not wsName = "FinPlatesBolts"
                     Set targetWs = designWorksheetsIO(tagsRelation.Name)
                     ret = TransferSingleDesignWorksheetData(targetWs, i, tagsRelation)
                 Next
@@ -556,10 +609,10 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
         Else
             tag_Summary = tagsRelation.tagRelation(key)
         End If
-        'Debug.Assert Not tag = "Shape 2"
         If columnTags.Exists(tag_Summary) Then
             val = df_sum.idata(dfRowNum, columnTags(tag_Summary).colNumInDF)
             g_log.WriteLog "     Input Tag: '" & key & ":" & tag_Summary & "'; value: " & val
+
             targetWs.Range(WsInputs(tag_Ws)) = val
         Else
             If Not tag_Summary = "-" Then g_log.WriteLog "     Cannot find Input Tag in the summary sheet: '" & tag_Summary & "';"
@@ -576,7 +629,7 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
         End If
         If columnTags.Exists(tag_Summary) Then
             val = targetWs.Range(WsOutputs(tag_Ws))
-            g_log.WriteLog "     Output Tag: '" & key & ":" & tag_Summary & "'; value: " & val
+            g_log.WriteLog "     Output Tag: '" & key & ":" & tag_Summary & "'; value: " & CStr(val)
             df_sum.idata(dfRowNum, columnTags(tag_Summary).colNumInDF) = val
             If Not activeOutputCols.Exists(tag_Summary) Then
                 activeOutputCols.Add tag_Summary, columnTags(tag_Summary)

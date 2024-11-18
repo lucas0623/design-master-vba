@@ -72,9 +72,9 @@ Public Function Letter2Number(letter As String) As Long
 'PURPOSE: Convert a given letter into it's corresponding Numeric Reference
 'SOURCE: www.TheSpreadsheetGuru.com/the-code-vault
 
-    Dim ColumnNumber As Long
-    ColumnNumber = Range(letter & 1).column
-    Letter2Number = ColumnNumber
+    Dim columnNumber As Long
+    columnNumber = Range(letter & 1).column
+    Letter2Number = columnNumber
 End Function
 Public Function Number2Letter(num As Long) As String
 'PURPOSE: Convert a given number into it's corresponding Letter Reference
@@ -141,10 +141,10 @@ Public Function getLocVar(ws As Worksheet, label As String, isRow As Boolean, Op
     
     With ws
         If isRow Then
-            getLocVar = Application.Match(label, .rows(rowOrColNum), 0)
+            getLocVar = Application.match(label, .rows(rowOrColNum), 0)
             
         Else
-            getLocVar = Application.Match(label, .Columns(rowOrColNum), 0)
+            getLocVar = Application.match(label, .Columns(rowOrColNum), 0)
         End If
     End With
     
@@ -627,4 +627,84 @@ Public Function LastNonEmptyColumn(ws As Worksheet, rowNum As Long) As Long
 
 End Function
 
+Function IsCellAddress(str As String) As Boolean
+    Dim regex As Object
+    Dim match As Object
+    Dim columnPart As String
+    Dim rowPart As String
+    Dim columnNumber As Long
+    Dim rowNumber As Long
+    
+    Dim var As Variant, CellAddress As String
+    var = Split(str, "!")
+    CellAddress = var(UBound(var))
+    ' Create the regex object
+    Set regex = CreateObject("VBScript.RegExp")
+    
+    ' Regular expression to match full cell addresses
+    ' Example: '[Workbook.xlsx]Sheet'!$A$1 or just A1
+    regex.Pattern = "(\$?[A-Z]+\$?\d+)"
+    regex.IgnoreCase = True
+    regex.Global = False
+    
+    ' Check if the cell address matches the pattern
+    If Not regex.test(CellAddress) Then
+        IsCellAddress = False
+        Exit Function
+    End If
+    
+    ' Extract the actual cell reference (e.g., A1 from $A$1)
+    regex.Pattern = "\$?([A-Z]+)\$?(\d+)"
+    Set match = regex.Execute(CellAddress)
+    
+    If match.count = 0 Then
+        IsCellAddress = False
+        Exit Function
+    End If
+    
+    columnPart = match(0).SubMatches(0)
+    rowPart = match(0).SubMatches(1)
+    
+    ' Convert column part to a column number
+    columnNumber = 0
+    Dim i As Long
+    For i = 1 To Len(columnPart)
+        columnNumber = columnNumber * 26 + (Asc(UCase(Mid(columnPart, i, 1))) - Asc("A") + 1)
+    Next i
+    
+    ' Convert row part to a row number
+    rowNumber = CLng(rowPart)
+    
+    ' Validate the column and row numbers against Excel's limits
+    If columnNumber >= 1 And columnNumber <= 16384 And rowNumber >= 1 And rowNumber <= 1048576 Then
+        IsCellAddress = True
+    Else
+        IsCellAddress = False
+    End If
+End Function
 
+Function GetAddressWorksheetName(str As String) As String
+    Dim regex As Object
+    Dim match As Object
+    Dim lastExclaimation As Integer, lastBracket As Integer
+    Dim wsName As String
+    
+    If Not IsCellAddress(str) Then Exit Function
+
+    lastExclaimation = FindLastCharInStr(str, "!")
+    If lastExclaimation = 0 Then Exit Function 'no worksheet name
+    
+    lastBracket = FindLastCharInStr(str, "]")
+    
+    wsName = Mid(str, lastBracket + 1, lastExclaimation - lastBracket - 1)
+    
+    If left(wsName, 1) = "'" Then
+        wsName = Mid(wsName, 2, Len(wsName) - 1)
+    End If
+    
+    If Right(wsName, 1) = "'" Then
+        wsName = Mid(wsName, 1, Len(wsName) - 1)
+    End If
+    
+    GetAddressWorksheetName = wsName
+End Function

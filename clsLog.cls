@@ -32,6 +32,8 @@ Public Enum WarningType
     missingJointCoor = 11
     unexpectedResult = 12
     duplicateDesignWorksheet = 13
+    InvalidAddress = 14
+    DuplicateIOTagName = 15
 '    objRepeatedname = 3
 '    objNotFound = 4 'jt cannot be found for joint assignment data. New joint is created.
 '    objAssignment_WrongDataType = 5 'Wrong Data Type. Record Skip.
@@ -92,7 +94,7 @@ Public Sub CreateNewFile(isDetailMode As Boolean)
     On Error GoTo CleanCache
     Set oFile = fso.CreateTextFile(pPath)
     On Error GoTo 0
-    ReDim p_iWarn(12)
+    ReDim p_iWarn(14)
     oFile.WriteLine "Start at " & Format(Date, "dd MMM yyyy") & "-" & Time() & vbCrLf
     mIsDetailMode = isDetailMode
     
