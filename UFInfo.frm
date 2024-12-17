@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UFInfo 
    Caption         =   "Information"
-   ClientHeight    =   2310
-   ClientLeft      =   120
-   ClientTop       =   6465
-   ClientWidth     =   5940
+   ClientHeight    =   2880
+   ClientLeft      =   150
+   ClientTop       =   6570
+   ClientWidth     =   7425
    OleObjectBlob   =   "UFInfo.frx":0000
 End
 Attribute VB_Name = "UFInfo"
@@ -12,6 +12,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 
 
 '@Folder("Userform.GeneralForm")

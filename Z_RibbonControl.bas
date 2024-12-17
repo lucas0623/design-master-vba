@@ -10,7 +10,6 @@ Attribute VB_Name = "Z_RibbonControl"
 Public g_log As New clsLog, isDetailMode As Boolean
 Private ds_sys As New DataSheetSystem
 
-
 Public Sub ProcessRibbon_DM(Control As IRibbonControl)
 
     'On Error GoTo Err:
@@ -19,7 +18,7 @@ Public Sub ProcessRibbon_DM(Control As IRibbonControl)
     Application.ScreenUpdating = False
     
     If Not ds_sys.isInitialized Then CreateSystemSheet
-    isDetailMode = ds_sys.prop("ImportLog", "isDetailMode")
+    'isDetailMode = ds_sys.prop("ImportLog", "isDetailMode")
     'isDetailMode = True
     
     Select Case Control.ID
@@ -386,7 +385,7 @@ End Sub
 
 Private Sub ShowVersion()
     Dim uf As New UFInfo
-    UFInfo.Initialize "v4.0.2", "07 Nov 2024"
+    UFInfo.Initialize "v4.1.1", "17 Dec 2024"
     UFInfo.Show
 End Sub
 

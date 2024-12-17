@@ -168,6 +168,7 @@ Private Sub ConfigureBindings()
     this.Bindings.BindCheckBox mcboMaxMinEnv(4), "MaxMinEnv4", this.ViewModel
     this.Bindings.BindCheckBox mcboMaxMinEnv(5), "MaxMinEnv5", this.ViewModel
     this.Bindings.BindCheckBox mcbIsEachLC, "IsEachLC", this.ViewModel
+    this.Bindings.BindComboBox mcboPosition, "PosFilterTypeStr", this.ViewModel
     
     Dim MoveListBoxItemCommand As New MoveListBoxItemCommand
     

@@ -22,9 +22,10 @@ Private wsInteract As clsWorksheetsInteraction
 Private genFunc As clsGeneralFunctions
 Private UI As clsUIManager
 Private ds_sys As DataSheetSystem
-
 Private df_ele As clsDataFrame, df_force As clsDataFrame
 Private df_joint As clsDataFrame
+
+Private isVer10_2 As Boolean 'true for version = or after v10.2; false for 10.1 or before
 
 Private isTerminate As Boolean
 
@@ -63,6 +64,18 @@ Private Function IDataFormatConvertor_ReadData(filePath As String) As Integer
     Set ws_gsa = ActiveSheet
     Set gsaWB = ActiveWorkbook
     
+    '2B. Determine GSA Version
+    Dim gsaVerText As Variant
+    gsaVerText = ws_gsa.Columns("A:A").Find("Oasys")
+    gsaVerText = Split(Split(gsaVerText, " ")(1), ".")
+    If CInt(gsaVerText(0)) < 10 Then
+        isVer10_2 = False
+    ElseIf CInt(gsaVerText(0)) = 10 And CInt(gsaVerText(1)) <= 1 Then
+        isVer10_2 = False
+    Else
+        isVer10_2 = True
+    End If
+   
     '3. Read Data into dataframe
     Set df_ele = ReadGSATableToDF(ws_gsa, "START_TABLE Elements", True)
     If isTerminate Then
@@ -84,7 +97,11 @@ Private Function IDataFormatConvertor_ReadData(filePath As String) As Integer
     End With
     
     heads_ele = Array("Elem", "Property", "Topology", "Topology 2", "Length/ Area/Volume", "Type", "Orient. Angle")
-    Set df_ele = df_ele.Filter_byHeads(genFunc.CStr_arr(heads_ele))
+    If isVer10_2 Then
+        Set df_ele = GSAEleTableToDF_v10_2(df_ele)
+    Else
+        Set df_ele = df_ele.Filter_byHeads(genFunc.CStr_arr(heads_ele))
+    End If
     'Set df_ele = df_ele.Filter_str("Type", "Beam")
     
     '4. Modify the force data frame to fit the format of this worksheet
@@ -93,8 +110,10 @@ Private Function IDataFormatConvertor_ReadData(filePath As String) As Integer
 '        Set df_force = Factory.NewclsDataFrame(myArr2, True, False)
         If df_force.columnNum("Env") = -1 Then df_force.InsertEmptyColumn 4, "Env" 'insert Column if there is no 'Env' Column
         heads_force = Array("Elem", "Pos", "Case", "Env", "Fx", "Fz", "Fy", "Mxx", "Mzz", "Myy")
-        Set df_force = df_force.Filter_byHeads(genFunc.CStr_arr(heads_force))
         
+        Set df_force = df_force.Filter_byHeads(genFunc.CStr_arr(heads_force))
+        df_force.AddEmptyColumn ("subElem")
+        df_force.column("subElem") = df_force.column("Elem")
         'Modify the 'Pos' from % to True length
         Dim col_pos As Long, col_eleID As Long, col_length As Long
         Dim dict_eleLen As Object
@@ -115,6 +134,30 @@ Private Function IDataFormatConvertor_ReadData(filePath As String) As Integer
 TerminateFunc:
     IDataFormatConvertor_ReadData = ret
     If Not gsaWB Is Nothing Then gsaWB.Close False
+End Function
+
+Private Function GSAEleTableToDF_v10_2(gsaEleDataFrame) As clsDataFrame
+    Dim tempDF As New clsDataFrame, tempDF2 As New clsDataFrame
+    Dim heads_ele1 As Variant, heads_ele2() As String
+    Dim i As Long
+    heads_ele1 = Array("Elem", "Property", "Topology", "Length/ Area/Volume", "Type", "Orient. Angle")
+    heads_ele2 = genFunc.CStr_arr(Array("Elem", "Property", "Topology", "Topology 2", "Length/ Area/Volume", "Type", "Orient. Angle"))
+    Set tempDF = gsaEleDataFrame.Filter_byHeads(genFunc.CStr_arr(heads_ele1))
+    Set tempDF2 = New clsDataFrame
+    tempDF2.heads = heads_ele2
+    
+    tempDF2.column("Elem") = tempDF.column("Elem")
+    tempDF2.column("Property") = tempDF.column("Property")
+    tempDF2.column("Length/ Area/Volume") = tempDF.column("Length/ Area/Volume")
+    tempDF2.column("Type") = tempDF.column("Type")
+    tempDF2.column("Orient. Angle") = tempDF.column("Orient. Angle")
+    Dim topoTextArr As Variant
+    For i = 1 To tempDF2.CountRows
+        topoTextArr = Split(tempDF.idata(i, 3), " ")
+        tempDF2.idata(i, 3) = topoTextArr(0)
+        tempDF2.idata(i, 4) = topoTextArr(1)
+    Next i
+    Set GSAEleTableToDF_v10_2 = tempDF2
 End Function
 
 Private Function ReadGSATableToDF(ws As Worksheet, tableName As String, Optional isMustRead As Boolean = False) As clsDataFrame

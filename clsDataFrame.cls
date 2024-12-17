@@ -419,6 +419,13 @@ End Property
 Property Let heads(arr() As String) 'to assign head tags to the data
     Dim i As Integer
     Dim diff As Integer
+    Dim colNum As Long
+    colNum = Me.CountColumns
+    If Not colNum = UBound(arr) - LBound(arr) + 1 Then
+        ReDim pHeads(1 To UBound(arr) - LBound(arr) + 1)
+    End If
+    'Check if the number of heads match the number of column in existing dataframe
+    
     diff = LBound(arr) - LBound(pHeads)
     For i = LBound(pHeads) To UBound(pHeads)
         pHeads(i) = arr(i + diff)
@@ -566,13 +573,18 @@ End Property
 Property Let column(headTag As String, val As Variant)
     
     Dim i As Long, count As Long
-    Dim colNum As Long
+    Dim colNum As Long, dataSize As Long
 
 '    If headTags <> "" Then
 '        colNum = GetArrNum(headTag, pHeads)
 '    End If
     colNum = Me.columnNum(headTag)
-    
+    dataSize = UBound(val) - LBound(val) + 1
+    If Not dataSize = Me.CountRows Then
+        ReDim pData(1 To dataSize, 1 To Me.CountColumns)
+        ReDim pRowTags(1 To dataSize)
+        pIsInitialized = True
+    End If
     If IsArray(val) Then
         For i = LBound(val) To UBound(val)
             Me.idata(1 + count, colNum) = val(i)
@@ -696,7 +708,11 @@ End Property
 'End Property
 
 Property Get CountColumns() As Long
-    CountColumns = UBound(pData, 2)
+    If genFuncs.isInitialised(pHeads) Then
+        CountColumns = UBound(pHeads)
+    Else
+        CountColumns = 0
+    End If
 End Property
 
 Property Get LookupRowNum(val As Variant, rCol As Long)
@@ -736,7 +752,7 @@ Sub AddEmptyColumn(Optional head As String = "")
     Dim numOfCol As Long
     numOfCol = 1
     ReDim Preserve pHeads(1 To UBound(pHeads) + numOfCol)
-    ReDim pData(1 To UBound(pData, 1), 1 To UBound(pData, 2) + numOfCol)
+    ReDim Preserve pData(1 To UBound(pData, 1), 1 To UBound(pData, 2) + numOfCol)
     pHeads(UBound(pHeads)) = head
     mColl_Heads.Add UBound(pHeads), head
 End Sub
@@ -1092,7 +1108,11 @@ Sub QuickSort(colNum As Long)
 End Sub
 
 Property Get CountRows() As Long
-    CountRows = UBound(pRowTags) - LBound(pRowTags) + 1
+    If Not genFuncs.isInitialised(pRowTags) Then
+        CountRows = 0
+    Else
+        CountRows = UBound(pRowTags) - LBound(pRowTags) + 1
+    End If
 End Property
 
 'Private Function GetArrNum(myStr As String, myStrArr() As String) As Long 'to search for certain string in the data

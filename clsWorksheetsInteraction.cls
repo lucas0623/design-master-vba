@@ -648,7 +648,7 @@ Function IsCellAddress(str As String) As Boolean
     regex.Global = False
     
     ' Check if the cell address matches the pattern
-    If Not regex.test(CellAddress) Then
+    If Not regex.TEST(CellAddress) Then
         IsCellAddress = False
         Exit Function
     End If

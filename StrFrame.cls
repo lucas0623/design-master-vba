@@ -361,8 +361,9 @@ End Function
 
 Public Function GetFrameForces_BothEnd(Optional loadCombFilter As Variant, Optional stepTypeFilter As Variant) As Collection
     Dim coll As New Collection
-    coll.Add GetFrameForces_EndI(loadCombFilter, stepTypeFilter)
-    coll.Add GetFrameForces_EndJ(loadCombFilter, stepTypeFilter)
+    Set coll = GetFrameForces_EndI(loadCombFilter, stepTypeFilter)
+    AddColltoColl coll, GetFrameForces_EndJ(loadCombFilter, stepTypeFilter)
+    
     Set GetFrameForces_BothEnd = coll
 End Function
 

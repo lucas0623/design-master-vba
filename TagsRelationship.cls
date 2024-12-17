@@ -15,21 +15,29 @@ Attribute VB_Exposed = False
 Private mName As String
 Private mIsPrint As Boolean
 Private mTagRelation As Object
+Private mIsDefaultInput As Object 'a dict to contains the information of 'Use Default Input' Data
+Private mDefaultInput As Object 'a dict to contains the information of Default Input
 
 ' Class Initialization
 Private Sub Class_Initialize()
     mIsPrint = True
     Set mTagRelation = CreateObject("Scripting.Dictionary")
+    Set mIsDefaultInput = CreateObject("Scripting.Dictionary")
+    Set mDefaultInput = CreateObject("Scripting.Dictionary")
 End Sub
 
 ' Method to add a tag relationship
-Public Function Add(designTag As String, summaryTag As String) As Integer
+Public Function Add(designTag As String, summaryTag As String, isDefaultInput As Boolean, defaultInput As Variant) As Integer
     Dim ret As Integer
-    If Not mTagRelation.Exists(designTag) Then
-        mTagRelation.Add designTag, summaryTag
-    Else
+    If mTagRelation.Exists(designTag) Then
         ret = -1
+        GoTo ExitFunc
     End If
+
+    mTagRelation.Add designTag, summaryTag
+    mIsDefaultInput.Add designTag, isDefaultInput
+    mDefaultInput.Add designTag, defaultInput
+    
 ExitFunc:
     Add = ret
 End Function
@@ -41,8 +49,15 @@ Public Function GetSummaryTag(designTag As String) As String
     Else
         GetSummaryTag = "" ' Return empty if not found
     End If
+
 End Function
 
+Public Property Get isDefaultInput() As Object
+    Set isDefaultInput = mIsDefaultInput
+End Property
+Public Property Get defaultInput() As Object
+    Set defaultInput = mDefaultInput
+End Property
 Public Property Get tagRelation() As Object
     Set tagRelation = mTagRelation
 End Property

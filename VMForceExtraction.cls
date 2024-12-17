@@ -25,7 +25,7 @@ Private msLcSelect() As String, msMemberNamesSelect() As String, msSectionsSelec
 Private msLcExcl() As String, msMemberNamesExcl() As String, msSectionsExcl() As String
 Private mGroupBy As String ', mbIsBySec As Boolean 'true = by section, false = by member
 Private mGroupByNodeOrConnType As String
-Private mPosFilterType As PositionFilterType, mdblPosFilterVal As Double
+Private mPosFilterType As PositionFilterType, mdblPosFilterVal As Double, mPosFilterTypeStr As String
 Private mbIsExtremeCase As Boolean, mbIsEachLC As Boolean
 Private mbExtremeCase() As Boolean
 Private mbMaxMinEnv() As Boolean
@@ -138,6 +138,7 @@ Public Sub LoadDefaultVal()
     Me.IsByNode = False
     'mbIsExtremeCase = True
     Me.IsEachLC = False
+    Me.PosFilterType = NoFilter
 
     Me.ExtremeCase0 = True
     Me.ExtremeCase1 = True
@@ -230,8 +231,8 @@ Public Function LoadLastSaveVal()
     Me.ConnTypesExcl = genFunc.CStr_arr(ds_sys.propCondense(propGrpName, "Connection Type Excluded"))
     Me.Nodes = genFunc.CStr_arr(ds_sys.propCondense(propGrpName, "Node Selected"))
     Me.NodesExcl = genFunc.CStr_arr(ds_sys.propCondense(propGrpName, "Node Excluded"))
-    mPosFilterType = StringToPositionFilterType(ds_sys.prop(propGrpName, "Position Filter Type"))
-    mdblPosFilterVal = ds_sys.prop(propGrpName, "Position Filter Value")
+    Me.PosFilterTypeStr = ds_sys.prop(propGrpName, "Position Filter Type")
+    'Me.PosFilterTypeStr = ds_sys.prop(propGrpName, "Position Filter Value")
     'Me.IsBySec = CBool(ds_sys.prop(propGrpName, "isBySec"))
     Me.GroupBy = ds_sys.prop(propGrpName, "Group By")
     Me.GroupByNodeOrConnType = ds_sys.prop(propGrpName, "Group By Node Or Conn Type")
@@ -564,12 +565,24 @@ Public Property Let NodesExcl(arr() As String)
     msNodeExcl = arr
     OnPropertyChanged "NodesExcl"
 End Property
+
+Public Property Get PosFilterTypeStr() As String
+    PosFilterTypeStr = mPosFilterTypeStr
+End Property
+
+Public Property Let PosFilterTypeStr(str As String)
+    mPosFilterTypeStr = str
+    mPosFilterType = StringToPositionFilterType(str)
+    OnPropertyChanged "PosFilterTypeStr"
+End Property
+
 Public Property Get PosFilterType() As PositionFilterType
     PosFilterType = mPosFilterType
 End Property
 
 Public Property Let PosFilterType(ByVal pft As PositionFilterType)
     mPosFilterType = pft
+    mPosFilterTypeStr = PositionFilterTypeToString(pft)
 End Property
 
 Public Property Get PosFilterValue() As Double
