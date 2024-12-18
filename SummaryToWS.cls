@@ -38,6 +38,12 @@ Private countSucessful As Long, countTotal As Long 'count how many rows of data 
 
 Private isMissingKey As Boolean
 
+'For time checking and efficiency study
+Private startTime_WriteData As Double, endTime_WriteData As Double, totalTime_WriteData As Double
+Private startTime_Cal As Double, endTime_Cal As Double, totalTime_Cal As Double
+Private startTime_ReadData As Double, endTime_ReadData As Double, totalTime_ReadData As Double
+Private startTime_TransferData As Double, endTime_TransferData As Double, totalTime_TransferData As Double
+
 Public Property Get CompleteMessageAddition() As String
     CompleteMessageAddition = mCompleteMessageAddition
 End Property
@@ -56,7 +62,7 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     'On Error GoTo ExitFunc:
     Application.Calculation = xlCalculationManual
     Application.ScreenUpdating = False
-    
+    Application.FormatStaleValues = False
     g_log.WriteLog "Operation: 'SummaryToDsWs' Started."
     
     ret = Initialize
@@ -99,9 +105,12 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     g_log.WriteLog "Summary Worksheet: " & sumWS.Name
     g_log.WriteLog "Row Range: " & fRow_summary & " to " & lRow_summary
     
+    startTime_TransferData = Timer
     ret = TransferDataFromSummary
     If Not ret = 0 Then
     End If
+    endTime_TransferData = Timer
+    totalTime_TransferData = endTime_TransferData - startTime_TransferData
     
     ret = WriteResultToSummary
     If Not ret = 0 Then
@@ -109,6 +118,10 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
     
     Application.ScreenUpdating = True
     Application.Calculation = xlAutomatic
+    Application.FormatStaleValues = True
+    Application.StatusBar = False
+    DisplayTimeUsed
+    
     mCompleteMessageAddition = countSucessful & " out of " & countTotal & " number of worksheets' data are sucessfully transferred."
     Exit Function
 ExitFunc:
@@ -335,11 +348,8 @@ Function ReadSingleDesignWorksheetData(refCell As Range, refRow As Long) As Desi
     ' Read and set Input values
     fRow = refRow + 1
     lRow = wsInteract.FindLastRow(refRow, rCol, ws)
-    'Debug.Assert Not refCell.value = "LapSpliceJointForceDist_I"
     For i = fRow To lRow
-'        Debug.Print "fRow=" & fRow
-'        Debug.Print "lRow=" & lRow
-'        Debug.Print "i=" & i
+
         key = ws.Cells(i, rCol).value
         value = ws.Cells(i, rCol + 1).value
         
@@ -529,6 +539,8 @@ Function ReadSingleDesignGroupData(refCell As Range, refRow As Long) As DesignWs
         Set tagsRelation = New TagsRelationship
         
         wsName = ws.Cells(i, rCol)
+        If Not designWorksheetsIO.Exists(wsName) Then GoTo NextIteration
+        
         g_log.WriteLog "      Reading worksheet '" & wsName & "' data"
         tagsRelation.Name = wsName
         tagsRelation.isPrint = ws.Cells(i, rCol + 1)
@@ -550,6 +562,7 @@ Function ReadSingleDesignGroupData(refCell As Range, refRow As Long) As DesignWs
         Next j
         designGroup.AddTagsRelationship tagsRelation
         i = lRowSameGroup
+NextIteration:
     Next i
     
     Set ReadSingleDesignGroupData = designGroup
@@ -561,10 +574,12 @@ Private Function TransferDataFromSummary() As Integer
     Dim targetWsTag As SummaryWsColTags, targetWs As DesignWsIO, wsName As String
     Dim designGroup As DesignWsGroup, tagsRelation As TagsRelationship
     Dim ret As Long, key As Variant
-    For i = 1 To df_sum.CountRows
+    Dim numRows As Long
+    numRows = df_sum.CountRows
+    For i = 1 To numRows
         If Not activeRows(i) Then GoTo NextIteration
         g_log.WriteLog "Current Row: " & i + fRow_summary
-        
+        Application.StatusBar = "Transferring " & i & "/" & numRows & " rows of data"
         For Each key In targetWsTags
             Set targetWsTag = targetWsTags(key)
             wsName = df_sum.idata(i, targetWsTag.colNumInDF)
@@ -617,7 +632,7 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
     
     Set targetWs = wsInteract.setWorksheet(targetWsIO.Name, isSkipErr:=True)
     If targetWs Is Nothing Then GoTo ExitFunc:
-    
+    startTime_WriteData = Timer
     For Each key In WsInputs.keys
         tag_Ws = key
         
@@ -650,8 +665,15 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
         End If
 NextKey:
     Next key
+    endTime_WriteData = Timer
+    totalTime_WriteData = totalTime_WriteData + endTime_WriteData - startTime_WriteData
     
+    startTime_Cal = Timer
     targetWs.Calculate
+    endTime_Cal = Timer
+    totalTime_Cal = totalTime_Cal + endTime_Cal - startTime_Cal
+    
+    startTime_ReadData = Timer
     For Each key In WsOutputs.keys
         tag_Ws = key
         If tagsRelation Is Nothing Then
@@ -670,6 +692,9 @@ NextKey:
             If Not tag_Summary = "-" Then g_log.WriteLog "     Cannot find Output Tag in the summary sheet: '" & tag_Summary & "';"
         End If
     Next key
+    
+    endTime_ReadData = Timer
+    totalTime_ReadData = totalTime_ReadData + endTime_ReadData - startTime_ReadData
     
     Dim pdfName As String
     If isOutputPDF Then
@@ -756,5 +781,13 @@ ErrHandler:
     
     Create_PDF = -1
 End Function
+
+Private Sub DisplayTimeUsed()
+    Debug.Print "Time taken for All Transfer: " & Format(totalTime_TransferData, "0.00") & " seconds"
+    Debug.Print "Time taken for Writing Data to Design Worksheets: " & Format(totalTime_WriteData, "0.00") & " seconds"
+    Debug.Print "Time taken for Calculation of Design Worksheets: " & Format(totalTime_Cal, "0.00") & " seconds"
+    Debug.Print "Time taken for Reading Data From Design Worksheets: " & Format(totalTime_ReadData, "0.00") & " seconds"
+    Debug.Print "Sum of Above for Checking " & Format(totalTime_WriteData + totalTime_Cal + totalTime_ReadData, "0.00") & " seconds"
+End Sub
 
 
