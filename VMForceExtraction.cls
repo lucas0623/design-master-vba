@@ -91,16 +91,17 @@ Private Sub Class_Initialize()
     msSectionsAll = genFunc.CStr_arr(genFunc.DeDupeOneDimArray(df.iColumn(1)))
     
     Set df = ds_member.GetDataframe(ds_member.tagSelector.memID)
-    msMemberNamesAll = genFunc.CStr_arr(df.iColumn(1))
+    msMemberNamesAll = genFunc.CStr_arr(genFunc.ChangeArrBase(df.iColumn(1), 0))
+
     
     Set df = ds_frmForce.GetDataframe(ds_frmForce.tagSelector.loadComb)
     msLcAll = genFunc.CStr_arr(genFunc.DeDupeOneDimArray(df.iColumn(1)))
     
     Set df = dsJt.GetDataframe(dsJt.tagSelector.ID)
-    msNodeAll = genFunc.CStr_arr(df.iColumn(1))
+    msNodeAll = genFunc.CStr_arr(genFunc.ChangeArrBase(df.iColumn(1), 0))
     
     Set df = dsConnType.GetDataframe(dsConnType.tagSelector.connID)
-    If df.isInitialized Then msConnTypeAll = genFunc.CStr_arr(df.iColumn(1))
+    If df.isInitialized Then msConnTypeAll = genFunc.CStr_arr(genFunc.ChangeArrBase(df.iColumn(1), 0))
     
     ReDim mbExtremeCase(11)
     ReDim mbMaxMinEnv(5)
@@ -197,19 +198,19 @@ Public Function LoadLastSaveVal()
 '        temp = genFunc.SortArray(temp)
 '        console.Log temp, "temp"
 '        If genFunc.isInitialised(temp) Then temp = ggenFunc.CStr_arr(temp)
-        isIdentical = VerifiedSavedData(propGrpName, "Load Comb Selected", "Load Comb Excluded", msLcAll)
+        isIdentical = VerifySavedData(propGrpName, "Load Comb Selected", "Load Comb Excluded", msLcAll)
         If Not isIdentical Then GoTo CannotLoad
 
-        isIdentical = VerifiedSavedData(propGrpName, "Section Selected", "Section Excluded", msSectionsAll)
+        isIdentical = VerifySavedData(propGrpName, "Section Selected", "Section Excluded", msSectionsAll)
         If Not isIdentical Then GoTo CannotLoad
 
-        isIdentical = VerifiedSavedData(propGrpName, "Member Selected", "Member Excluded", msMemberNamesAll)
+        isIdentical = VerifySavedData(propGrpName, "Member Selected", "Member Excluded", msMemberNamesAll)
         If Not isIdentical Then GoTo CannotLoad
         
-        isIdentical = VerifiedSavedData(propGrpName, "Connection Type Selected", "Connection Type Excluded", msConnTypeAll)
+        isIdentical = VerifySavedData(propGrpName, "Connection Type Selected", "Connection Type Excluded", msConnTypeAll)
         If Not isIdentical Then GoTo CannotLoad
         
-        isIdentical = VerifiedSavedData(propGrpName, "Node Selected", "Node Excluded", msNodeAll)
+        isIdentical = VerifySavedData(propGrpName, "Node Selected", "Node Excluded", msNodeAll)
         If Not isIdentical Then GoTo CannotLoad
       
         mbIsLoadLastSaveVerified = True
@@ -252,7 +253,7 @@ ExitFunc:
     g_log.WriteLogInDetailMode "Last Save Cannot be Loaded."
 End Function
 
-Private Function VerifiedSavedData(propGrpName As String, prop1 As String, prop2 As String, compareData As Variant) As Boolean
+Private Function VerifySavedData(propGrpName As String, prop1 As String, prop2 As String, compareData As Variant) As Boolean
     Dim ret As Boolean, i As Long
     
     Dim temp As Variant, temp1 As Variant, temp2 As Variant, count As Long
@@ -288,9 +289,8 @@ Private Function VerifiedSavedData(propGrpName As String, prop1 As String, prop2
 '            GoTo ExitFunction
 '        End If
 '    Next i
-    ret = True
 ExitFunction:
-    VerifiedSavedData = ret
+    VerifySavedData = ret
 End Function
 Public Sub SaveInput()
     'Save User Input to the

@@ -69,12 +69,12 @@ Public Sub Remove(designTag As String)
 End Sub
 
 ' Method to print all tag relations (for debugging or display)
-Public Sub PrintTagRelations()
-    Dim key As Variant
-    For Each key In mTagRelation.keys
-        Debug.Print "Design Tag: " & key & " => Summary Tag: " & mTagRelation(key)
-    Next key
-End Sub
+'Public Sub PrintTagRelations()
+'    Dim key As Variant
+'    For Each key In mTagRelation.keys
+'        Debug.Print "Design Tag: " & key & " => Summary Tag: " & mTagRelation(key)
+'    Next key
+'End Sub
 
 Public Property Get Name() As String
     Name = mName

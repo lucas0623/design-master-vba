@@ -39,6 +39,11 @@ Private countSucessful As Long, countTotal As Long 'count how many rows of data 
 Private isMissingKey As Boolean
 
 'For time checking and efficiency study
+Private startTime_Initialize As Double, endTime_Initialize As Double, totalTime_Initialize As Double
+Private startTime As Double, endTime As Double
+Private totalTime_ReadSummaryDataToDF As Double, totalTime_ReadDesignWorksheetIOData As Double
+Private totalTime_ReadDesignGroupData As Double, totalTime_FormColumnTags As Double
+Private totalTime_IdentifyActiveRows As Double
 Private startTime_WriteData As Double, endTime_WriteData As Double, totalTime_WriteData As Double
 Private startTime_Cal As Double, endTime_Cal As Double, totalTime_Cal As Double
 Private startTime_ReadData As Double, endTime_ReadData As Double, totalTime_ReadData As Double
@@ -75,32 +80,52 @@ Public Function Main(Optional summarySheet As Worksheet) As Integer
         GoTo ExitFunc
     End If
     
+    startTime_Initialize = Timer
+    
+    startTime = Timer
     ret = ReadSummaryDataToDF
     If Not ret = 0 Then
         g_log.WriteLog "No Data is Found in the Summary Sheet."
         mTerminateMessageMain = "No Data is Found in the Summary Sheet. Please check if there are column tags in the first row of the Summary Sheet"
         GoTo ExitFunc
     End If
+    endTime = Timer
+    totalTime_ReadSummaryDataToDF = endTime - startTime
     
+    startTime = Timer
     ret = ReadDesignWorksheetIOData
     If Not ret = 0 Then
         g_log.WriteLog "Fail to read worksheet Input/Output data. Exit Operation."
         GoTo ExitFunc
     End If
+    endTime = Timer
+    totalTime_ReadDesignWorksheetIOData = endTime - startTime
     
+    startTime = Timer
     ret = ReadDesignGroupData
     If Not ret = 0 Then
         g_log.WriteLog "Fail to read Design Worksheet Group data. Exit Operation."
         GoTo ExitFunc
     End If
+    endTime = Timer
+    totalTime_ReadDesignGroupData = endTime - startTime
     
+    startTime = Timer
     ret = FormColumnTags
     If Not ret = 0 Then
     End If
+    endTime = Timer
+    totalTime_FormColumnTags = endTime - startTime
     
+    startTime = Timer
     ret = IdentifyActiveRows
     If Not ret = 0 Then
     End If
+    endTime = Timer
+    totalTime_IdentifyActiveRows = endTime - startTime
+    
+    endTime_Initialize = Timer
+    totalTime_Initialize = endTime - startTime
     
     g_log.WriteLog "Summary Worksheet: " & sumWS.Name
     g_log.WriteLog "Row Range: " & fRow_summary & " to " & lRow_summary
@@ -783,11 +808,18 @@ ErrHandler:
 End Function
 
 Private Sub DisplayTimeUsed()
+    Debug.Print "Time taken for All Initialization: " & Format(totalTime_Initialize, "0.00") & " seconds"
+    Debug.Print "Time taken for ReadSummaryDataToDF: " & Format(totalTime_ReadSummaryDataToDF, "0.00") & " seconds"
+    Debug.Print "Time taken for ReadDesignWorksheetIOData: " & Format(totalTime_ReadDesignWorksheetIOData, "0.00") & " seconds"
+    Debug.Print "Time taken for ReadDesignGroupData: " & Format(totalTime_ReadDesignGroupData, "0.00") & " seconds"
+    Debug.Print "Time taken for FormColumnTags: " & Format(totalTime_FormColumnTags, "0.00") & " seconds"
+    Debug.Print "Time taken for IdentifyActiveRows: " & Format(totalTime_IdentifyActiveRows, "0.00") & " seconds"
     Debug.Print "Time taken for All Transfer: " & Format(totalTime_TransferData, "0.00") & " seconds"
     Debug.Print "Time taken for Writing Data to Design Worksheets: " & Format(totalTime_WriteData, "0.00") & " seconds"
     Debug.Print "Time taken for Calculation of Design Worksheets: " & Format(totalTime_Cal, "0.00") & " seconds"
     Debug.Print "Time taken for Reading Data From Design Worksheets: " & Format(totalTime_ReadData, "0.00") & " seconds"
     Debug.Print "Sum of Above for Checking " & Format(totalTime_WriteData + totalTime_Cal + totalTime_ReadData, "0.00") & " seconds"
+    
 End Sub
 
 
