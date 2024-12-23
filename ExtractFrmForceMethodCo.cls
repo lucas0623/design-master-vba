@@ -9,14 +9,17 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '@Folder "Operation.ExtractFrameForce"
 Implements IExtractFrmForceMethod
+Private genFuncs As New clsGeneralFunctions
 Private mUFControl As VMForceExtraction
 Private lc() As String, MemberNames() As String, sections() As String 'for use in Userform
+Private lcExcluded() As String, MemberNamesExcluded() As String, sectionsExcluded() As String 'for use in Userform
 Private PosFilterType As PositionFilterType, posFilterVal As Double
 Private IsBySec As Boolean 'true = by section, false = by member
-Private isExtremeCase As Boolean, IsEachLC As Boolean
+Private isExtremeCase As Boolean, IsEachLC As Boolean, isEnvMaxMin As Boolean
 Private ExtremeCase() As Boolean
 Private MaxMinEnv() As Boolean
 Private pModel As StrModel
+
 
 Private Sub IExtractFrmForceMethod_Initialize(model As StrModel, UFControl As Object)
     Set mUFControl = UFControl
@@ -30,12 +33,16 @@ Private Function GetUserInput() As Integer
         lc = .lc
         MemberNames = .MemberNames
         sections = .sections
+        lcExcluded = .lcExcl
+        MemberNamesExcluded = .MemberNamesExcl
         PosFilterType = .PosFilterType
+        sectionsExcluded = .SectionsExcl
         posFilterVal = .PosFilterValue
         IsBySec = .IsBySec
         isExtremeCase = True
         IsEachLC = .IsEachLC
         If isExtremeCase Then ExtremeCase = .ExtremeCase
+        isEnvMaxMin = .isEnvMaxMin
         MaxMinEnv = .MaxMinEnv
     End With
 End Function
@@ -45,65 +52,98 @@ Private Function ExtractCorrespondenceFrmForces() As Collection
     GetUserInput
 
     'Logic: 1. Loop Each Section/Member, filter frms. 2. (Loop each LC) 3.Filter FrameForces 4.Operation
-    Dim cFrms As New Collection, cFrmForces As New Collection, tempFrmForces As New Collection
+    Dim filteredFrmForces As Collection, groupedFrmForces As Object
+    Dim key As Variant, keys As Variant
+    Dim cFrms As New Collection, cFrmForces As New Collection
     Dim reFrmForces As New Collection 'extracted frm force
-    Dim i As Long, j As Long, k As Long, uLimit As Long
+    Dim frmForceAnalyser As StrFrmForceAnalyser
+    Dim i As Long, n As Long
     'Looping for each section/member
-    If IsBySec Then
-        uLimit = UBound(sections)
-    Else
-        uLimit = UBound(MemberNames)
-    End If
+    g_log.WriteLog "Filtering Frame Forces according to user input..."
+    Set filteredFrmForces = FilterFrmForces
     
-    g_log.WriteLog "Current Procedure: OperExtractFrmForceCo.ExtractCorrespondenceFrmForces"
-    g_log.WriteLog "IsBySec = " & CStr(IsBySec)
-    g_log.WriteLog "Total number of sections/members = " & uLimit + 1
-    For i = 0 To uLimit 'looping for each section/ member
-         g_log.WriteLog "Start extracting forces for no. " & i + 1 & "/" & uLimit + 1 & " sections/members."
-         Application.StatusBar = "Start extracting forces for no. " & i + 1 & "/" & uLimit + 1 & " sections/members."
-         g_log.WriteLogWithTime "   Start filtering objects for force extraction"
-        'filter by section/ membernames
-        If IsBySec Then
-            g_log.WriteLog "   Section name = " & sections(i)
-            Set cFrms = pModel.frmsBySection(sections(i))
-            'pModel.FilterCollOfObjWithKey cFrms, sections(i)
-            Set cFrms = pModel.FilterCollOfObj(cFrms, "memberName", MemberNames)
-        Else
-            g_log.WriteLog "   Member name = " & MemberNames(i)
-            Set cFrms = pModel.frmsByMember(MemberNames(i))
-            Set cFrms = pModel.FilterCollOfObj(cFrms, "section", sections)
-        End If
-        
-        If cFrms.count = 0 Then
-            g_log.RaiseWarning "Cannot find the above section/member. Record Skip.", frmForceExtract_objNotFound
-            GoTo NextIteration
-        End If
-        
-        If IsEachLC Then
-            For j = 0 To UBound(lc)
-                g_log.WriteLogWithTime "   Current load combination/case = " & lc(j)
-                g_log.WriteLogWithTime "   Filtering Load combination/case."
-                Set cFrmForces = GetFrmForcesColl(cFrms, loadCombFilter:=lc(j), posType:=PosFilterType, posVal:=posFilterVal) 'Filter Frame Forces
-                g_log.WriteLogWithTime "   Filter Completed. Remaining Number of Frame Force Object = " & cFrmForces.count
-                Set cFrmForces = pModel.frmForceAnalyser.FindExtremeForceWithMaxMinEnv(cFrmForces, ExtremeCase, MaxMinEnv) 'Operation (Man Min Env)
-                AddColltoColl reFrmForces, cFrmForces 'Save Data
-                g_log.WriteLogWithTime "   " & cFrmForces.count & " nos. of frame forces results are saved. (Cumulative Total: = " & reFrmForces.count & ")"
-            Next j
-        Else
-            g_log.WriteLogWithTime "   Filtering Load combination/case = " & lc(j)
-            Set cFrmForces = GetFrmForcesColl(cFrms, loadCombFilter:=lc, posType:=PosFilterType, posVal:=posFilterVal) 'Filter Frame Forces
-            g_log.WriteLogWithTime "   Filter Completed. Remaining Number of Frame Force Object = " & cFrmForces.count
-            Set cFrmForces = pModel.frmForceAnalyser.FindExtremeForceWithMaxMinEnv(cFrmForces, ExtremeCase, MaxMinEnv) 'Operation (Man Min Env)
-            AddColltoColl reFrmForces, cFrmForces 'Save Data
-            g_log.WriteLogWithTime "   " & cFrmForces.count & " nos. of frame forces results are saved. (Cumulative Total: = " & reFrmForces.count & ")"
-        End If
+    g_log.WriteLog "Grouping frame forces according to user input"
+    Set groupedFrmForces = GroupingFrmForces(filteredFrmForces)
+    
+    g_log.WriteLog "Grouping frame forces..."
+    Set frmForceAnalyser = pModel.frmForceAnalyser(filteredFrmForces)
+    
+    keys = GetSortedKeys(groupedFrmForces)
+    n = UBound(keys) - LBound(keys) + 1
+    g_log.WriteLog "Total number of sections/members = " & UBound(keys) - LBound(keys) + 1
+    For i = LBound(keys) To UBound(keys) 'looping for each section/ member
+         g_log.WriteLog "Start extracting forces for no. " & i + 1 & "/" & n & " grouped result. key = " & keys(i)
+         Application.StatusBar = "Start extracting forces for no. " & i + 1 & "/" & n & " grouped result."
+
+        Set cFrmForces = groupedFrmForces(keys(i))
+        Set cFrmForces = frmForceAnalyser.FindExtremeForceWithMaxMinEnv(cFrmForces, ExtremeCase, MaxMinEnv) 'Operation (Man Min Env)
+        AddColltoColl reFrmForces, cFrmForces 'Save Data
 NextIteration:
     Next i
     
     Set ExtractCorrespondenceFrmForces = reFrmForces
 End Function
 
+Private Function FilterFrmForces() As Collection
+'This function filter frame forces from ALL frame forces based on user input.
+'The return frame forces will be used to
+    Dim filteredFrmForces As New Collection
+    Set filteredFrmForces = pModel.frmForces
+    'ReDim filterBool(0)
+    'Filter Section
+    If genFuncs.isInitialised(sectionsExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "sectionName", sections)
+    'Filter Members
+    If genFuncs.isInitialised(MemberNamesExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "memberName", MemberNames)
+    'Filter load combinations
+    If genFuncs.isInitialised(lcExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "loadComb", lc)
+    'Filter Position
+    'filterBool(0) = True
+    If posType = BothEnd Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEnd", True)
+    ElseIf posType = EndI Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndI", True)
+    ElseIf posType = EndJ Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndJ", True)
+    End If
+    Set FilterFrmForces = filteredFrmForces
+End Function
 
+Private Function GroupingFrmForces(frmForces As Collection) As Object
+'Save the filter frmForces into a dictionary according to user input for further processing
+    Dim dict As Object
+    Dim key As Variant, keyPrefix As Variant, frmForce As Variant
+    Dim coll As Collection
+    Set dict = CreateObject("Scripting.Dictionary")
+    For Each frmForce In frmForces
+    
+        If IsBySec Then
+            keyPrefix = frmForce.frame.section
+        Else
+            keyPrefix = frmForce.memberName
+        End If
+        
+        If IsEachPos And IsEachLC Then
+            key = keyPrefix & frmForce.loadComb & frmForce.pos_fromMemJtI_percent
+        ElseIf IsEachPos And Not IsEachLC Then
+            key = keyPrefix & frmForce.pos_fromMemJtI_percent
+        ElseIf Not IsEachPos And IsEachLC Then
+            key = keyPrefix & frmForce.loadComb
+        Else
+            key = keyPrefix
+        End If
+        
+        If dict.Exists(key) Then
+            dict(key).Add frmForce
+        Else
+            Set coll = New Collection
+            coll.Add frmForce
+            dict.Add key, coll
+            
+        End If
+    Next
+    
+    Set GroupingFrmForces = dict
+End Function
 Private Function GetFrmForcesColl(frames As Collection, Optional loadCombFilter As Variant, Optional stepTypeFilter As Variant, _
                                 Optional posType As PositionFilterType, Optional posVal As Double = -1) As Collection
     'This Function filter the frm force objects. Input = a collection of Frame Objects. Output = a Collection of Frame Force Objects
@@ -138,6 +178,29 @@ End Sub
 
 Private Function IExtractFrmForceMethod_ExtractForce() As Collection
     Set IExtractFrmForceMethod_ExtractForce = ExtractCorrespondenceFrmForces
+End Function
+
+Function GetSortedKeys(dict As Object) As Variant
+    Dim keys As Object
+    Dim key As Variant
+    Dim sortedArray() As Variant
+    
+    ' Create a new ArrayList using late binding
+    Set keys = CreateObject("System.Collections.ArrayList")
+    
+    ' Add each key from the dictionary to the ArrayList
+    For Each key In dict.keys
+        keys.Add key
+    Next key
+    
+    ' Sort the keys
+    keys.Sort
+    
+    ' Convert the sorted ArrayList to an array
+    sortedArray = keys.ToArray
+    
+    ' Return the sorted array
+    GetSortedKeys = sortedArray
 End Function
 
 

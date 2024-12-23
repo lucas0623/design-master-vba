@@ -18,6 +18,7 @@ Attribute VB_Exposed = False
 
 '24 Aug 2023 - Initial
 '*******************************************************
+Private mModel As StrModel
 Private caseDesc As String
 
 Private Enum extremeCaseType
@@ -35,6 +36,10 @@ Private Enum extremeCaseType
     MinM3 = 11
     NoExtremeCase = 12
 End Enum
+
+Public Sub Initialize(model As StrModel)
+    Set mModel = model
+End Sub
 Public Function FindExtremeForceWithMaxMinEnv(coll_frmForce As Collection, ExtremeCase() As Boolean, _
                             isMaxMinEnv() As Boolean) As Collection
     'This is the main function for extract correpondence caes.
@@ -106,7 +111,9 @@ Private Function FindExtremeForce_oneCase(frmForces As Collection, enum_extremeC
     'to find out the
     With cExtremeForce
         g_log.WriteLogWithTime "   Start Filtering FrameForce at the extreme case"
-        Set cFrmForce = cExtremeForce.frame.GetFrameForces(.loadComb, SpecifiedStation:=.station, subFrameNameFilter:=.subFrameName)
+        
+        Set cFrmForce = mModel.frmForcesOneLcAtPos(.subFrameName, .loadComb, .pos_fromMemJtI_percent)
+        'Set cFrmForce = cExtremeForce.frame.GetFrameForces(.loadComb, SpecifiedStation:=.station, subFrameNameFilter:=.subFrameName)
         g_log.WriteLogWithTime "   Filter completed. There are " & cFrmForce.count & " frame forces item."
         If cFrmForce.count > 2 Then g_log.RaiseWarning "WARNING: Please check your data. There are more than 2 results at the same location of an element.", unexpectedResult
     End With

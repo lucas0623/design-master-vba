@@ -238,7 +238,7 @@ Private Function GetSummmarySheetsName() As Variant
         Next i
     End With
 
-    GetSummmarySheetsName = arrL.toarray
+    GetSummmarySheetsName = arrL.ToArray
 End Function
 
 Private Function Number2Letter(colNum As Long) As String

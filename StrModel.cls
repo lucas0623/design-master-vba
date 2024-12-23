@@ -37,8 +37,9 @@ Private mLoadCombs As New Collection, mLoadCombs_ID As New Collection
 Private pID_joint As Long, pID_ele As Long, pID_loadPat As Long
 
 'For Stroing and Extraction of Forces
-Private mFrmForces As New Collection, mFrmForcesBySection As New Collection
-Private mFrmForcesByMember As New Collection, mFrmForcesByLc As New Collection
+Private mFrmForces As New Collection ', mFrmForcesBySection As New Collection
+'Private mFrmForcesByMember As New Collection, mFrmForcesByLc As New Collection
+Private mFrmForcesOneLcAtPos As Object 'group the frmforces by frameName,load comb and pos (1/2 result at 1 group)
 Private mFrmForceAnalyser As StrFrmForceAnalyser
 Private mStrModelConstructor As StrModelConstructor
 
@@ -280,6 +281,12 @@ Public Property Get frmForces() As Object
     Set frmForces = mFrmForces
 End Property
 
+Public Property Get frmForcesOneLcAtPos(subEleName As String, loadComb As String, pos_fromMemJtI_percent As Double) As Object
+    Dim key As Variant, coll As Collection
+    key = subEleName & loadComb & pos_fromMemJtI_percent
+    Set coll = mFrmForcesOneLcAtPos(key)
+    Set frmForcesOneLcAtPos = coll
+End Property
 '***********************Structural Model Object Base Methods and Functions***************************************
 Public Function GetStrObjTypeName(strObjectType As StructureObjectType) As String
     Select Case strObjectType
@@ -448,23 +455,42 @@ Private Function GroupCollByProp(coll As Collection, propName As String) As Coll
     Set GroupCollByProp = coll_grouped
 End Function
 
-Public Function FilterCollOfObj(coll As Collection, propName As String, criteria() As String) As Collection
+Public Function FilterCollOfObj(coll As Collection, propName As String, criteria As Variant) As Collection
     Dim i As Long
     Dim coll_filtered As New Collection
     Dim critColl As Object
     Dim key As Variant
+'    Dim startTime As Double, endTime As Double, totalTime As Double
+'    Dim startTime_add As Double, endTime_add As Double, totalTime_add As Double
+    Dim tempItem As Variant, count As Long
     Set critColl = CreateObject("Scripting.Dictionary")
 
     For i = LBound(criteria) To UBound(criteria)
         critColl.Add criteria(i), criteria(i)
     Next i
-    For i = 1 To coll.count
-
-        key = CallByName(coll(i), propName, VbGet)
+'    startTime = Timer
+    For Each tempItem In coll
+'        count = count + 1
+'        startTime_add = Timer
+        key = CallByName(tempItem, propName, VbGet)
+'        endTime_add = Timer
+'        totalTime_add = totalTime_add + endTime_add - startTime_add
+        
         If critColl.Exists(key) Then
-            coll_filtered.Add coll(i)
+            coll_filtered.Add tempItem
         End If
-    Next i
+        
+        
+'        If count Mod 10000 = 0 Then
+'            endTime = Timer
+'            totalTime = endTime - startTime
+'            Debug.Print "Time used = "; Format(str(totalTime), "0.00") & "s"
+'            Debug.Print "Time used for getting key= "; Format(str(totalTime_add), "0.00") & "s"
+'            totalTime_add = 0
+'            startTime = Timer
+'        End If
+        
+    Next
     Set FilterCollOfObj = coll_filtered
 End Function
 '
@@ -589,8 +615,36 @@ End Function
 '    Set FlattenCollOfColl = result
 'End Function
 '*************For Force Extraction & Analysis*******************
-Property Get frmForceAnalyser() As StrFrmForceAnalyser
-    If mFrmForceAnalyser Is Nothing Then Set mFrmForceAnalyser = New StrFrmForceAnalyser
+Private Sub GroupFrameForces(Optional filteredFrmForces As Collection)
+    Dim frmForce As StrFrameForce, key As Variant
+    Dim frmForces As Collection
+    Dim dict As Object, coll As Collection
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    If filteredFrmForces Is Nothing Then
+        Set frmForces = mFrmForces
+    Else
+        Set frmForces = filteredFrmForces
+    End If
+    
+    For Each frmForce In frmForces
+        key = frmForce.subFrameName & frmForce.loadComb & frmForce.pos_fromMemJtI_percent
+        If dict.Exists(key) Then
+            dict(key).Add frmForce
+        Else
+            Set coll = New Collection
+            coll.Add frmForce
+            dict.Add key, coll
+        End If
+    Next
+    Set mFrmForcesOneLcAtPos = dict
+End Sub
+Property Get frmForceAnalyser(Optional filteredFrmForces As Collection) As StrFrmForceAnalyser
+    If mFrmForceAnalyser Is Nothing Then
+        Set mFrmForceAnalyser = New StrFrmForceAnalyser
+        mFrmForceAnalyser.Initialize Me
+        GroupFrameForces filteredFrmForces
+    End If
     Set frmForceAnalyser = mFrmForceAnalyser
 End Property
 

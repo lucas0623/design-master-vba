@@ -106,6 +106,11 @@ Public Property Get memberJFrameName() As String
     memberJFrameName = pFrm.member.jFrameName
 End Property
 
+Public Property Get sectionName() As String
+    sectionName = pFrm.section
+End Property
+
+
 Public Property Get preFrameName() As String
     Dim frm As StrFrame
     Set frm = pFrm.member.preFrame(pFrm.Name)
@@ -231,4 +236,26 @@ Public Property Let maxMinEnvPerm(Text As String)
     pDesc_MaxMinEnvPerm = Text
 End Property
 
+Public Property Get isMemberEndI() As Boolean
+    If Me.pos_fromMemJtI_percent = 0 Then
+        isMemberEndI = True
+    Else
+        isMemberEndI = False
+    End If
+End Property
 
+Public Property Get isMemberEndJ() As Boolean
+    If Me.pos_fromMemJtI_percent = 1 Then
+        isMemberEndJ = True
+    Else
+        isMemberEndJ = False
+    End If
+End Property
+
+Public Property Get isMemberEnd() As Boolean
+    If isMemberEndI Or isMemberEndJ Then
+        isMemberEnd = True
+    Else
+        isMemberEnd = False
+    End If
+End Property
