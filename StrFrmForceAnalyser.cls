@@ -18,6 +18,7 @@ Attribute VB_Exposed = False
 
 '24 Aug 2023 - Initial
 '*******************************************************
+Private mModel As StrModel
 Private caseDesc As String
 
 Private Enum extremeCaseType
@@ -35,6 +36,10 @@ Private Enum extremeCaseType
     MinM3 = 11
     NoExtremeCase = 12
 End Enum
+
+Public Sub Initialize(model As StrModel)
+    Set mModel = model
+End Sub
 Public Function FindExtremeForceWithMaxMinEnv(coll_frmForce As Collection, ExtremeCase() As Boolean, _
                             isMaxMinEnv() As Boolean) As Collection
     'This is the main function for extract correpondence caes.
@@ -47,23 +52,47 @@ Public Function FindExtremeForceWithMaxMinEnv(coll_frmForce As Collection, Extre
     
     For i = LBound(ExtremeCase) To UBound(ExtremeCase)
         If ExtremeCase(i) Then
-            Set tempColl = FindExtremeForce_oneCase(coll_frmForce, IndexToExtremeCaseType(i)) 'Filter out Extreme Force Location
-            g_log.WriteLogWithTime "   Start Env Max Min"
-            AddColltoColl reColl, EnvMaxMinWithExtremeCase(tempColl, IndexToExtremeCaseType(i), isMaxMinEnv)
-            g_log.WriteLogWithTime "   Complete Env Max Min"
+            Set tempColl = FindFrameForcePair(LocateExtremeForce(coll_frmForce, IndexToExtremeCaseType(i)), IndexToExtremeCaseType(i)) 'Filter out Extreme Force Location
+            g_log.WriteLogWithTime "   Start Creating Permutations for Max/Min Force Pair"
+            AddColltoColl reColl, CreateFrameForcesPermutations(tempColl, IndexToExtremeCaseType(i), isMaxMinEnv)
+            g_log.WriteLogWithTime "   Complete Creating Permutations for Max/Min Force Pair"
         End If
     Next i
     Set FindExtremeForceWithMaxMinEnv = reColl
-    '2. Env Max Min if needed
-    '3. Return all the collection of forces
 End Function
 
-Private Function FindExtremeForce_oneCase(frmForces As Collection, enum_extremeCaseType As extremeCaseType) As Collection
+Public Function FindExtremeForce(coll_frmForce As Collection, ExtremeCase() As Boolean) As Collection
+    'This is the main function for extract correpondence caes.
+    'Input: coll_frmForce = collection of frame force objects
+    'Logic: 1. locate the pos of the extreme case in the coll_frmForce object
+    '       2. Env Max Min, Create Permutation. Then Return the collection of frame force object.
+    
+    Dim i As Integer
+    Dim tempColl As New Collection
+    Dim objForce As StrFrameForce, maxForce As StrFrameForce
+    'Form frm Force Obj from the returned 2D array
+    
+    For i = LBound(ExtremeCase) To UBound(ExtremeCase)
+        If ExtremeCase(i) Then
+            Set objForce = New StrFrameForce
+            Set maxForce = LocateExtremeForce(coll_frmForce, IndexToExtremeCaseType(i))
+            With maxForce
+                objForce.Init2 .frame, .station, .loadComb, .stepType, _
+                            .p, .V2, .V3, .t, .M2, .M3
+            End With
+            objForce.extremeCaseType = maxForce.extremeCaseType
+            tempColl.Add objForce
+        End If
+    Next i
+    Set FindExtremeForce = tempColl
+End Function
+
+Private Function LocateExtremeForce(frmForces As Collection, enum_extremeCaseType As extremeCaseType) As StrFrameForce
     'this function is used to locate the extreme case of frame force objects
     'return should be 1/2 nos of frame force objects (1 if that is not ENV load comb, 2 = env load comb, max and min rows
     Dim i As Long
     Dim forceIndex As Integer, isMax As Boolean
-    Dim cExtremeForce As StrFrameForce, cFrmForce As New Collection
+    Dim cExtremeForce As StrFrameForce ', cFrmForce As New Collection
     Dim frmForce As StrFrameForce
     forceIndex = ExtremeCaseToForceIndex(enum_extremeCaseType)
 
@@ -104,24 +133,31 @@ Private Function FindExtremeForce_oneCase(frmForces As Collection, enum_extremeC
 '        End If
 '    End If
     'to find out the
-    With cExtremeForce
-        g_log.WriteLogWithTime "   Start Filtering FrameForce at the extreme case"
-        Set cFrmForce = cExtremeForce.frame.GetFrameForces(.loadComb, SpecifiedStation:=.station, subFrameNameFilter:=.subFrameName)
-        g_log.WriteLogWithTime "   Filter completed. There are " & cFrmForce.count & " frame forces item."
-        If cFrmForce.count > 2 Then g_log.RaiseWarning "WARNING: Please check your data. There are more than 2 results at the same location of an element.", unexpectedResult
+'    With cExtremeForce
+'        Set cFrmForce = mModel.frmForcesOneLcAtPos(.subFrameName, .loadComb, .pos_fromMemJtI_percent)
+'        If cFrmForce.count > 2 Then g_log.RaiseWarning "WARNING: Please check your data. There are more than 2 results at the same location of an element.", unexpectedResult
+'    End With
+    
+
+    cExtremeForce.extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
+
+    
+    Set LocateExtremeForce = cExtremeForce
+End Function
+
+Private Function FindFrameForcePair(frmForce As StrFrameForce, enum_extremeCaseType As extremeCaseType) As Collection
+    Dim coll As New Collection
+    With frmForce
+        Set coll = mModel.frmForcesOneLcAtPos(.subFrameName, .loadComb, .pos_fromMemJtI_percent)
+        If coll.count > 2 Then g_log.RaiseWarning "WARNING: Please check your data. There are more than 2 results at the same location of an element.", unexpectedResult
     End With
-    For i = 1 To cFrmForce.count
-        cFrmForce(i).extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
+    
+    For i = 1 To coll.count
+        coll(i).extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
     Next i
-    
-    Set FindExtremeForce_oneCase = cFrmForce
+    Set FindFrameForcePair = coll
 End Function
-
-Private Function SearchFrameForceCollection(enum_extremeCaseType As extremeCaseType, val As Double) As Collection
-    
-End Function
-
-Private Function EnvMaxMinWithExtremeCase(frmForceAtPos As Collection, enum_extremeCaseType As extremeCaseType, isMaxMinEnv() As Boolean) As Collection
+Private Function CreateFrameForcesPermutations(frmForceAtPos As Collection, enum_extremeCaseType As extremeCaseType, isMaxMinEnv() As Boolean) As Collection
     'This function input = frm force at of certain frame at certain position and certain load comb. (1 or 2 objs)
     'output = Permuation of forces
     'maxMinEnv(0 to 5) represent the option to env max/min force pair for the P/V2/V3/T/M2/M3
@@ -143,7 +179,7 @@ Private Function EnvMaxMinWithExtremeCase(frmForceAtPos As Collection, enum_extr
         End With
         objForce.extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
         coll_objForce.Add objForce
-        Set EnvMaxMinWithExtremeCase = coll_objForce
+        Set CreateFrameForcesPermutations = coll_objForce
         Exit Function
     End If
     
@@ -187,7 +223,7 @@ Private Function EnvMaxMinWithExtremeCase(frmForceAtPos As Collection, enum_extr
         coll_objForce.Add objForce
     Next i
     
-    Set EnvMaxMinWithExtremeCase = coll_objForce
+    Set CreateFrameForcesPermutations = coll_objForce
 End Function
 
 Public Function EnvMaxMin(frmForceAtPos As Collection, isMaxMinEnv() As Boolean) As Collection
@@ -252,113 +288,7 @@ Public Function EnvMaxMin(frmForceAtPos As Collection, isMaxMinEnv() As Boolean)
     
     Set EnvMaxMin = coll_objForce
 End Function
-'Public Function FindEnvForcesAtPos(coll_frmForce As Collection) As Collection
-'    Dim i As Long
-'    Dim isMax As Boolean
-'    Dim cForce As StrFrameForce, cFrmForce As New Collection
-'
-'    'to find out the extreme force (Max P, Min P, etc...) from a collection of frm force
-'    Set cForce = coll_frmForce(1)
-'    For i = 1 To coll_frmForce.count
-'
-'        If isMax * coll_frmForce(i).force(forceIndex) > cExtremeForce.force(forceIndex) Then
-'            Set cExtremeForce = coll_frmForce(i)
-'        End If
-'    Next i
-'
-'    With cExtremeForce
-'        Set cFrmForce = cExtremeForce.frame.GetFrameForces(.loadcomb, SpecifiedStation:=.station)
-'    End With
-'
-'    For i = 1 To cFrmForce.count
-'        cFrmForce(i).extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
-'    Next i
-'
-'    Set FindExtremeForce_oneCase = cFrmForce
-'End Function
-'
-'Private Function EnvMaxMin(frmForceAtPos As Collection, isMaxMinEnv() As Boolean) As Collection
-'
-'    'maxMinEnv(0 to 5) represent the option to env max/min force pair for the P/V2/V3/T/M2/M3
-'    'True = Env (Get the ABS Max Result) --> suitable when the direction of the force is not important
-'    'Combinations will be created for all the 'false' options.
-'    Dim i As Integer
-'    Dim maxForce As StrFrameForce, minForce As StrFrameForce
-'    Dim forces_Origin As Variant 'Array of array, to contain the forces for creation of permutation
-'    Dim forces_Processed As Variant
-'    Dim objForce As StrFrameForce
-'    Dim coll_objForce As New Collection
-'    Dim caseDesc() As String
-'
-'    forces_Origin = CreateArrOfArr(frmForceAtPos, isMaxMinEnv, False)
-'
-'    If IsArray(forces_Origin) Then
-'        EnvMaxMin = frmForceAtPos
-'    Else
-'        forces_Processed = Permutation(forces_Origin, caseDesc)
-'        'Form frm Force Obj from the returned 2D array
-'        For i = 0 To UBound(forces_Processed)
-'            Set objForce = New StrFrameForce
-'            objForce.Init2 maxForce.frame, maxForce.station, maxForce.loadcomb, caseDesc(i), _
-'                            CDbl(forces_Processed(i, 0)), CDbl(forces_Processed(i, 1)), CDbl(forces_Processed(i, 2)), _
-'                            CDbl(forces_Processed(i, 3)), CDbl(forces_Processed(i, 4)), CDbl(forces_Processed(i, 5))
-'            objForce.extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
-'            coll_objForce.Add objForce
-'        Next i
-'    End If
-'
-'    Set EnvMaxMin = coll_objForce
-'End Function
-'
-'Private Function CreateArrOfArr(frmForceAtPos As Collection, isMaxMinEnv() As Boolean, Optional isExtremeCase As Boolean, _
-'                                Optional extremecases As Variant) As Variant
-''This function create the Force Array of Array for 'Permutation' creation
-'    Dim i As Integer
-'    Dim maxForce As StrFrameForce, minForce As StrFrameForce
-'    Dim forces_Origin As Variant 'Array of array, to contain the forces for creation of permutation
-'    Dim caseDesc() As String
-'
-'    If frmForceAtPos.count = 1 Then 'for data without max/min (load case/ not env load comb)
-''        Set objForce = New StrFrameForce
-''        'frmForceAtPos(1).extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
-''        With frmForceAtPos(1)
-''            objForce.Init2 .frame, .station, .loadcomb, "", .p, .V2, .V3, .t, .M2, .M3
-''        End With
-''        objForce.extremeCaseType = GetExtremeCaseName(enum_extremeCaseType)
-''        coll_objForce.Add objForce
-''        Set EnvMaxMinWithExtremeCase = coll_objForce
-'        Exit Function
-'    End If
-'
-'    If UCase(frmForceAtPos(1).stepType) = "MAX" Then
-'        Set maxForce = frmForceAtPos(1)
-'        Set minForce = frmForceAtPos(2)
-'    Else
-'        Set maxForce = frmForceAtPos(2)
-'        Set minForce = frmForceAtPos(1)
-'    End If
-'
-'    'Get the force array for creation of permutation
-'    ReDim forces_Origin(5)
-'    For i = 0 To 5
-'        If isExtremeCase And ExtremeCaseToForceIndex(enum_extremeCaseType) = i Then
-'            If ExtremeCaseToIsMax(enum_extremeCaseType) Then
-'                forces_Origin(i) = Array(maxForce.force(i))
-'            Else
-'                forces_Origin(i) = Array(minForce.force(i))
-'            End If
-'        ElseIf isMaxMinEnv(i) Then
-'            If Abs(maxForce.force(i)) > Abs(minForce.force(i)) Then
-'                forces_Origin(i) = Array(maxForce.force(i))
-'            Else
-'                forces_Origin(i) = Array(minForce.force(i))
-'            End If
-'        Else
-'            forces_Origin(i) = Array(maxForce.force(i), minForce.force(i))
-'        End If
-'    Next i
-'    CreateArrOfArr = forces_Origin
-'End Function
+
 
 Private Function Permutation(InputArr As Variant, caseDesc() As String) As Variant
     'input as array of array. 1st layer of array = groups, 2nd array = items in the same group

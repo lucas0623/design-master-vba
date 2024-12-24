@@ -26,9 +26,6 @@ Public Sub ProcessRibbon_DM(Control As IRibbonControl)
         Case "btn_SetupWorkbook"
             InitializeWorkbook
             
-        Case "btn_ImportDesignWS"
-            ImportDesignWorkbook
-
         Case "btn_CreateSummaryEmpty": CreateNewSummary 1
         Case "btn_CreateSummaryGeneral": CreateNewSummary 2
         Case "btn_CreateSummarySteelMember": CreateNewSummary 3
@@ -52,19 +49,9 @@ Public Sub ProcessRibbon_DM(Control As IRibbonControl)
         Case "btn_ExtractFrame_ExtremeCases"
             ExtractFrameForce_Correspondence
 
-        Case "btn_ExtractFrame_byMemberPosition"
-            ExtractFrameForce_WholeMember
-
-        Case "btn_ExtractFrame_WholeMemberForGraph"
-            ExtractFrameForce_WholeMemberForGraph
-
         Case "btn_ExtractConnAllNodeAndLc": ExtractConnForceAllNodesAndLC
         Case "btn_ExtractConnByCorrespondence": ExtractConnForceCorrespondence
         
-        'Plot Chart
-        Case "btn_PlotForceDiagrams"
-
-
         'Process Data
         Case "btn_ProcessData"
             ProcessData
@@ -92,7 +79,6 @@ Public Sub ProcessRibbon_DM(Control As IRibbonControl)
             ClearAllDataSheets
 
         Case "btn_ClearAllCharts"
-
 
         'Info
         Case "btn_viewLog"
@@ -385,7 +371,7 @@ End Sub
 
 Private Sub ShowVersion()
     Dim uf As New UFInfo
-    UFInfo.Initialize "v4.1.3", "20 Dec 2024"
+    UFInfo.Initialize "v4.1.4", "24 Dec 2024"
     UFInfo.Show
 End Sub
 

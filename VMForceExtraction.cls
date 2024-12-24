@@ -26,7 +26,7 @@ Private msLcExcl() As String, msMemberNamesExcl() As String, msSectionsExcl() As
 Private mGroupBy As String ', mbIsBySec As Boolean 'true = by section, false = by member
 Private mGroupByNodeOrConnType As String
 Private mPosFilterType As PositionFilterType, mdblPosFilterVal As Double, mPosFilterTypeStr As String
-Private mbIsExtremeCase As Boolean, mbIsEachLC As Boolean
+Private mbIsEnvMaxMin As Boolean, mbIsEachLC As Boolean, mbIsEachPos As Boolean
 Private mbExtremeCase() As Boolean
 Private mbMaxMinEnv() As Boolean
 Private mWsSum As Worksheet, msWsList() As String
@@ -137,8 +137,10 @@ Public Sub LoadDefaultVal()
     mdblPosFilterVal = -1
     Me.IsBySec = True
     Me.IsByNode = False
-    'mbIsExtremeCase = True
+    Me.isEnvMaxMin = True
+    
     Me.IsEachLC = False
+    Me.isEachPos = False
     Me.PosFilterType = NoFilter
 
     Me.ExtremeCase0 = True
@@ -237,9 +239,10 @@ Public Function LoadLastSaveVal()
     'Me.IsBySec = CBool(ds_sys.prop(propGrpName, "isBySec"))
     Me.GroupBy = ds_sys.prop(propGrpName, "Group By")
     Me.GroupByNodeOrConnType = ds_sys.prop(propGrpName, "Group By Node Or Conn Type")
-    'mbIsExtremeCase = ds_sys.prop(propGrpName, "isExtremeCase")
+    Me.isEnvMaxMin = ds_sys.prop(propGrpName, "isEnvMaxMin")
     Me.ExtremeCase = genFunc.CBoolArr(ds_sys.prop(propGrpName, "Extreme Cases"))
     Me.IsEachLC = ds_sys.prop(propGrpName, "isEachLC")
+    Me.isEachPos = ds_sys.prop(propGrpName, "isEachPos")
     Me.MaxMinEnv = genFunc.CBoolArr(ds_sys.prop(propGrpName, "Max Min Env"))
     g_log.WriteLogInDetailMode "Last Save Loaded."
     Exit Function
@@ -309,10 +312,10 @@ Public Sub SaveInput()
                                                 "Section Selected", "Section Excluded", _
                                                 "Node Selected", "Node Excluded", _
                                                 "Connection Type Selected", "Connection Type Excluded", _
-                                                "Position Filter Type", "Position Filter Value", _
+                                                "isEachPos", "Position Filter Type", "Position Filter Value", _
                                                 "Group By", "Group By Node Or Conn Type", _
                                                 "isExtremeCase", "Extreme Cases", _
-                                                "isEachLC", "Max Min Env"
+                                                "isEachLC", "isEnvMaxMin", "Max Min Env"
     End If
 
     '2. Write Data
@@ -333,9 +336,10 @@ Public Sub SaveInput()
     'ds_sys.prop(propGrpName, "isBySec") = mbIsBySec
     ds_sys.prop(propGrpName, "Group By") = mGroupBy
     ds_sys.prop(propGrpName, "Group By Node Or Conn Type") = mGroupByNodeOrConnType
-    ds_sys.prop(propGrpName, "isExtremeCase") = mbIsExtremeCase
+    ds_sys.prop(propGrpName, "isEnvMaxMin") = mbIsEnvMaxMin
     ds_sys.prop(propGrpName, "Extreme Cases") = mbExtremeCase
     ds_sys.prop(propGrpName, "isEachLC") = mbIsEachLC
+    ds_sys.prop(propGrpName, "isEachPos") = mbIsEachPos
     ds_sys.prop(propGrpName, "Max Min Env") = mbMaxMinEnv
 End Sub
 
@@ -399,7 +403,7 @@ Private Function GetSummmarySheetsName() As String()
 '    lastSaveSheet = ds_sys.prop(propGrpName, "wsName")
 '    If Not arrL.contains(lastSaveSheet) Then arrL.Add lastSaveSheet
     
-    GetSummmarySheetsName = genFunc.CStr_arr(arrL.toarray)
+    GetSummmarySheetsName = genFunc.CStr_arr(arrL.ToArray)
     
 End Function
 
@@ -602,13 +606,23 @@ Public Property Let IsEachLC(ByVal bEach As Boolean)
     OnPropertyChanged "IsEachLC"
 End Property
 
-'Public Property Get isExtremeCase() As Boolean
-'    isExtremeCase = mbIsExtremeCase
-'End Property
+Public Property Get isEachPos() As Boolean
+    isEachPos = mbIsEachPos
+End Property
 
-'Public Property Let isExtremeCase(ByVal extCase As Boolean)
-'    mbIsExtremeCase = extCase
-'End Property
+Public Property Let isEachPos(ByVal bEachPos As Boolean)
+    mbIsEachPos = bEachPos
+    OnPropertyChanged "IsEachPos"
+End Property
+
+Public Property Get isEnvMaxMin() As Boolean
+    isEnvMaxMin = mbIsEnvMaxMin
+End Property
+
+Public Property Let isEnvMaxMin(ByVal extCase As Boolean)
+    mbIsEnvMaxMin = extCase
+    OnPropertyChanged "IsEnvMaxMin"
+End Property
 
 Public Property Get ExtremeCase() As Boolean()
     ExtremeCase = mbExtremeCase

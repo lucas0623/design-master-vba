@@ -38,9 +38,7 @@ Public Enum FrameForceExtractMethod
     ByMemberPos = 2
     ByMemberForGraph = 3
 End Enum
-'Private CompareOption_P As Integer '0 for no comparison, 1 for return max (tension), 2 for return min (compression)
 
-'Private df_uls_result As clsDataFrame, df_sls_result As clsDataFrame
 
 Public Property Get CompleteMessageAddition() As String
     CompleteMessageAddition = mCompleteMessageAddition
@@ -135,9 +133,6 @@ Private Function FormStrObj() As Integer
         ret_formFrmForce = .FormFrmForceObj
         ret_formMem = .FormMemberObj
         
-'        ret_formFrm = .FormFrmObj(False, sections, MemberNames)
-'        ret_formFrmForce = .FormFrmForceObj(sections, MemberNames)
-'        ret_formMem = .FormMemberObj(MemberNames)
     End With
 End Function
 
@@ -148,14 +143,7 @@ Private Function SelectUF(method As FrameForceExtractMethod) As IView
             Set uf = New UFExtractForceFrame
             uf.Initialize UFControl
             UFControl.Initialize "ExtractFrmForceMethodCo"
-        Case ByMemberPos
-            Set uf = New UFExtractForceMemByPos
-            uf.Initialize UFControl
-            UFControl.Initialize "ExtractFrmForceMethodByPos"
-        Case ByMemberForGraph
-            Set uf = New UFExtractForceMemForGraph
-            uf.Initialize UFControl
-            UFControl.Initialize "ExtractFrmForceMethodGraph"
+        
     End Select
     Set SelectUF = uf
 End Function
@@ -183,13 +171,8 @@ Private Function SelectExtractionMethod(method As FrameForceExtractMethod) As IE
     Select Case method
     Case ByExtremeCases
         Set ExtractFrmForceMethod = New ExtractFrmForceMethodCo
-        
-    Case ByMemberPos
-        Set ExtractFrmForceMethod = New ExtractFrmForceMethodByPos
-    Case ByMemberForGraph
-        Set ExtractFrmForceMethod = New ExtractFrmForceMethodGraph
-        
     End Select
+    
     ExtractFrmForceMethod.Initialize mModel, UFControl
     Set SelectExtractionMethod = ExtractFrmForceMethod
 End Function

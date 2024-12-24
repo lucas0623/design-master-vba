@@ -43,7 +43,7 @@ Private mcboMaxMinEnv(5) As msForms.checkbox
 Private mcboPosition As msForms.ComboBox
 Private mcboCaseQuickToggle As msForms.ComboBox
 Private mcbCase(11) As msForms.checkbox, mcbCheckAll As msForms.checkbox
-Private mcbIsEachLC As msForms.checkbox
+Private mcbIsEachLC As msForms.checkbox, mcbIsEnvMaxMin As msForms.checkbox, mcbIsEachPos As msForms.checkbox
 
 Private mlstSec As msForms.listBox, mlstSecExcl As msForms.listBox, mbtnSec1 As msForms.CommandButton, mbtnSec2 As msForms.CommandButton
 Private mlstFrame As msForms.listBox, mlstFrameExcl As msForms.listBox, mbtnFrame1 As msForms.CommandButton, mbtnFrame2 As msForms.CommandButton
@@ -78,11 +78,11 @@ Private Sub Class_Initialize()
     form1.AddCheckBox_double mcbCase(8), mcbCase(9), vbNullString, "Max Mz", "Min Mz", True, True
     form1.AddCheckBox_double mcbCase(10), mcbCase(11), vbNullString, "Max My", "Min My", True, True
     
-    form1.AddCheckBox mcbIsEachLC, "Output result seperately for EACH load combination?", isCheck:=False, _
-                    tipText:="Checked: for Each Selected Section/Member --> for Each Selected Load Combination --> 1 sets of force and moments"
-
-    form1.AddCheckBox_double mcboMaxMinEnv(0), mcboMaxMinEnv(3), "Envelope Option for Max & Min Result", "P", "T", False, True, _
-    "Checked --> consider ABS MAX for the force/moment; Unchecked--> All Permutations will be Considered.  Example: Unchecked P and M3 for a Env Load Combination: Max/Min P/M3 will create 4 permutations"
+    form1.AddCheckBox mcbIsEnvMaxMin, "Create permutation(s) from envelope load combinations?", isCheck:=True, _
+                    tipText:="For result from envelope load combination, there are 2 results (max and min) at a position of the frame. " & _
+                    "When this option is checked, these 2 results will be considered as a whole."
+    form1.AddCheckBox_double mcboMaxMinEnv(0), mcboMaxMinEnv(3), "Is consider absolute maximum for envelope load combination result. ", "P", "T", False, True, _
+    "This is effective only when 'Create permutation(s) from envelope load combinations?' is checked. when checked --> consider ABS MAX for the force/moment; Unchecked--> All Permutations will be Considered.  Example: Unchecked P and M3 for a Env Load Combination: Max/Min P/M3 will create 4 permutations"
 '    "For Env Load Combination (LC) Output Data, there are 'max' and 'min' (2 rows of data) for certain element at certain location under certain LC." & vbNewLine & _
 '    "Hence, there will be 2^6 permutations of design data, if it is uncertain whether 'max' or 'min' is more critical. (keep all boxex unchecked for this cases)" & vbNewLine & _
 '    "In Opposite, if only would like to consider the abs max of certain force(s)/moment(s), then check the corresponding box(es). "
@@ -91,6 +91,10 @@ Private Sub Class_Initialize()
 
     'form1.AddComboBox Split("ALL,Major Axis Plane Forces,Axial and Bending,Custom", ","), _
                         mcboCaseQuickToggle, "Please select the correspondence case(s) for output:"
+    form1.AddCheckBox mcbIsEachLC, "Output result seperately for EACH load combination?", isCheck:=False, _
+                    tipText:="Checked: for Each Selected Section/Member --> for Each Selected Load Combination --> 1 sets of force and moments"
+    form1.AddCheckBox mcbIsEachPos, "Output result seperately for EACH position?", isCheck:=False, _
+                    tipText:="Checked: for Each Selected Section/Member --> for Each Filtered Position --> 1 sets of force and moments"
     form1.AddComboBox Split("No Filter,End I,End J,Both End", ","), mcboPosition, "Position Filter:"
     
     
@@ -113,7 +117,7 @@ Private Sub Class_Initialize()
                                     reCmdBtn1:=mbtnLc1, reCmdBtn2:=mbtnLc2
 
     form1.AdjustHeight
-    Set mbtnLoadInput = form1.AddButton("Load Default", width:=100, height:=20, top:=417, left:=10, pageNum:=-1)
+    Set mbtnLoadInput = form1.AddButton("Load Default", width:=100, height:=20, top:=468, left:=10, pageNum:=-1)
     Set mImageOkButton = form1.OKButton
 
     
@@ -161,6 +165,7 @@ Private Sub ConfigureBindings()
     this.Bindings.BindCheckBox mcbCase(9), "ExtremeCase9", this.ViewModel
     this.Bindings.BindCheckBox mcbCase(10), "ExtremeCase10", this.ViewModel
     this.Bindings.BindCheckBox mcbCase(11), "ExtremeCase11", this.ViewModel
+    this.Bindings.BindCheckBox mcbIsEnvMaxMin, "IsEnvMaxMin", this.ViewModel
     this.Bindings.BindCheckBox mcboMaxMinEnv(0), "MaxMinEnv0", this.ViewModel
     this.Bindings.BindCheckBox mcboMaxMinEnv(1), "MaxMinEnv1", this.ViewModel
     this.Bindings.BindCheckBox mcboMaxMinEnv(2), "MaxMinEnv2", this.ViewModel
@@ -168,6 +173,7 @@ Private Sub ConfigureBindings()
     this.Bindings.BindCheckBox mcboMaxMinEnv(4), "MaxMinEnv4", this.ViewModel
     this.Bindings.BindCheckBox mcboMaxMinEnv(5), "MaxMinEnv5", this.ViewModel
     this.Bindings.BindCheckBox mcbIsEachLC, "IsEachLC", this.ViewModel
+    this.Bindings.BindCheckBox mcbIsEachPos, "IsEachPos", this.ViewModel
     this.Bindings.BindComboBox mcboPosition, "PosFilterTypeStr", this.ViewModel
     
     Dim MoveListBoxItemCommand As New MoveListBoxItemCommand

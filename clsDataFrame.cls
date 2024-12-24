@@ -1215,7 +1215,7 @@ Private Function Operator_Not(fullList As Variant, arr_not As Variant) As Varian
         Next j
     Next i
     'ReDim returnArr(arrL_all.count - 1)
-    Operator_Not = arrL_all.toarray
+    Operator_Not = arrL_all.ToArray
 End Function
 
 'Sub Init_byRng(rng As Range, isHvHead As Boolean, isHvRowTag As Boolean)

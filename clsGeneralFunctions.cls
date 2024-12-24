@@ -72,7 +72,7 @@ Public Function ArrListTo2DArr(arrList As Object) As Variant
     Dim i As Long, j As Long
     Dim is_ini As Boolean
     
-    arr_list = arrList.toarray
+    arr_list = arrList.ToArray
     is_ini = False
     
     For i = LBound(arr_list) To UBound(arr_list)
@@ -222,7 +222,7 @@ Public Function CreateArray(ParamArray arr() As Variant) As Variant
             arrL.Add arr(i)
         End If
     Next i
-    CreateArray = arrL.toarray
+    CreateArray = arrL.ToArray
 End Function
 Public Sub BubbleSortArr2D1Key(ByRef vA As Variant, _
                        Optional ByVal bIsAscending As Boolean = True, _
@@ -428,7 +428,7 @@ Public Function SortArray(arr As Variant, Optional isA2Z As Boolean = True) As V
     Next i
     arrL.Sort
     If Not isA2Z Then arrL.Reverse
-    SortArray = arrL.toarray
+    SortArray = arrL.ToArray
 End Function
 
 Public Function TransposeArray(MyArray As Variant) As Variant
