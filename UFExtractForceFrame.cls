@@ -117,7 +117,7 @@ Private Sub Class_Initialize()
                                     reCmdBtn1:=mbtnLc1, reCmdBtn2:=mbtnLc2
 
     form1.AdjustHeight
-    Set mbtnLoadInput = form1.AddButton("Load Default", width:=100, height:=20, top:=417, left:=10, pageNum:=-1)
+    Set mbtnLoadInput = form1.AddButton("Load Default", width:=100, height:=20, top:=468, left:=10, pageNum:=-1)
     Set mImageOkButton = form1.OKButton
 
     

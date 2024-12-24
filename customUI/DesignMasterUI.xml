@@ -6,7 +6,6 @@
 	<group id = "group1" label = "Set Up">
 		<button id = "btn_SetupWorkbook" label = "Set Up Workbook" imageMso = "OpenStartPage" onAction = "ProcessRibbon_DM" size = "large"
 		supertip = "Create all necessary sheets for the add-in."/> 
-		<button id = "btn_ImportDesignWS" label = "Import Design Worksheet" imageMso = "ImportWorkbook" onAction = "ProcessRibbon_DM" size = "large"/> 
 		<menu id="menu11" label="Create New Summary Sheet" imageMso="FPTable" size = "large">
 			<button id = "btn_CreateSummaryEmpty" label = "Empty Summary Sheet" imageMso = "HappyFace" onAction = "ProcessRibbon_DM" 
 			supertip = "An empty summary table"/>
@@ -54,10 +53,6 @@
 	<group id = "group3B" label = "Extract Frame Force">
 		<menu id="menu3B1" label="Extract Frame Force To Summary Table" imageMso="DatasheetColumnLookup" size = "large">
 			<button id = "btn_ExtractFrame_ExtremeCases" label =  "Correspondence Cases" imageMso = "EquationMatrixGallery" onAction="ProcessRibbon_DM"/>
-			<button id = "btn_ExtractFrame_byMemberPosition" label =  "By Position of Member" imageMso = "GroupTableExternalData" onAction="ProcessRibbon_DM"
-			supertip = "Frame Forces at the specified location(s) of the selected member(s) will be extracted for each selected load case(s)/ combination(s). &#13;Permutations will be created for different combinations of Max/Min situations for each Envelope Type Load Combinations"/>
-			<button id = "btn_ExtractFrame_WholeMemberForGraph" label =  "All Forces Along Member (for graph plotting)" imageMso = "GroupTableExternalData" onAction="ProcessRibbon_DM"
-			supertip = "All Frame Forces along the selected members will be extracted. Ordered by Member->Load Combination->Max/Min->Position from I End"/>
 		</menu>
 		<menu id="menu3B2" label="Extract Connection Force To Summary Table" imageMso="DatasheetColumnLookup" size = "large">
 			<button id = "btn_ExtractConnByCorrespondence" label =  "Extract Forces at Connections (Correspondence Cases)" imageMso = "EquationMatrixGallery" onAction="ProcessRibbon_DM"
@@ -99,7 +94,7 @@
 	<group id = "group9" label = "Clean Data">
 		<button id = "btn_ClearWsData" label =  "Clear All Data" imageMso = "SheetDelete" onAction="ProcessRibbon_DM"
 		supertip = "All imported data will be deleted."/>
-		<button id = "btn_ClearAllCharts" label =  "Clear All Charts In Activesheet" imageMso = "InkDeleteAllInk" onAction="ProcessRibbon_DM"/>
+		<button id = "btn_ClearAllCharts" label =  "Clear All Charts In Activesheet" imageMso = "InkDeleteAllInk" onAction="ProcessRibbon_DM" visible="false"/>
 	</group>
 
 	<group id = "group10" label = "Info">

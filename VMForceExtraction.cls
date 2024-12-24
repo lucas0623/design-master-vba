@@ -140,7 +140,7 @@ Public Sub LoadDefaultVal()
     Me.isEnvMaxMin = True
     
     Me.IsEachLC = False
-    Me.IsEachPos = False
+    Me.isEachPos = False
     Me.PosFilterType = NoFilter
 
     Me.ExtremeCase0 = True
@@ -242,7 +242,7 @@ Public Function LoadLastSaveVal()
     Me.isEnvMaxMin = ds_sys.prop(propGrpName, "isEnvMaxMin")
     Me.ExtremeCase = genFunc.CBoolArr(ds_sys.prop(propGrpName, "Extreme Cases"))
     Me.IsEachLC = ds_sys.prop(propGrpName, "isEachLC")
-    Me.IsEachPos = ds_sys.prop(propGrpName, "isEachPos")
+    Me.isEachPos = ds_sys.prop(propGrpName, "isEachPos")
     Me.MaxMinEnv = genFunc.CBoolArr(ds_sys.prop(propGrpName, "Max Min Env"))
     g_log.WriteLogInDetailMode "Last Save Loaded."
     Exit Function
@@ -606,11 +606,11 @@ Public Property Let IsEachLC(ByVal bEach As Boolean)
     OnPropertyChanged "IsEachLC"
 End Property
 
-Public Property Get IsEachPos() As Boolean
-    IsEachPos = mbIsEachPos
+Public Property Get isEachPos() As Boolean
+    isEachPos = mbIsEachPos
 End Property
 
-Public Property Let IsEachPos(ByVal bEachPos As Boolean)
+Public Property Let isEachPos(ByVal bEachPos As Boolean)
     mbIsEachPos = bEachPos
     OnPropertyChanged "IsEachPos"
 End Property

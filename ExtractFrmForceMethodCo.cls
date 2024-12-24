@@ -15,7 +15,7 @@ Private lc() As String, MemberNames() As String, sections() As String 'for use i
 Private lcExcluded() As String, MemberNamesExcluded() As String, sectionsExcluded() As String 'for use in Userform
 Private PosFilterType As PositionFilterType, posFilterVal As Double
 Private IsBySec As Boolean 'true = by section, false = by member
-Private isExtremeCase As Boolean, IsEachLC As Boolean, isEnvMaxMin As Boolean
+Private isExtremeCase As Boolean, IsEachLC As Boolean, isEnvMaxMin As Boolean, isEachPos As Boolean
 Private ExtremeCase() As Boolean
 Private MaxMinEnv() As Boolean
 Private pModel As StrModel
@@ -44,6 +44,7 @@ Private Function GetUserInput() As Integer
         If isExtremeCase Then ExtremeCase = .ExtremeCase
         isEnvMaxMin = .isEnvMaxMin
         MaxMinEnv = .MaxMinEnv
+        isEachPos = .isEachPos
     End With
 End Function
 
@@ -76,7 +77,11 @@ Private Function ExtractCorrespondenceFrmForces() As Collection
          Application.StatusBar = "Start extracting forces for no. " & i + 1 & "/" & n & " grouped result."
 
         Set cFrmForces = groupedFrmForces(keys(i))
-        Set cFrmForces = frmForceAnalyser.FindExtremeForceWithMaxMinEnv(cFrmForces, ExtremeCase, MaxMinEnv) 'Operation (Man Min Env)
+        If isEnvMaxMin Then
+            Set cFrmForces = frmForceAnalyser.FindExtremeForceWithMaxMinEnv(cFrmForces, ExtremeCase, MaxMinEnv) 'Operation (Man Min Env)
+        Else
+            Set cFrmForces = frmForceAnalyser.FindExtremeForce(cFrmForces, ExtremeCase)
+        End If
         AddColltoColl reFrmForces, cFrmForces 'Save Data
 NextIteration:
     Next i
@@ -91,20 +96,25 @@ Private Function FilterFrmForces() As Collection
     Set filteredFrmForces = pModel.frmForces
     'ReDim filterBool(0)
     'Filter Section
+    g_log.WriteLog "Number of Frame Force Objects = " & filteredFrmForces.count
     If genFuncs.isInitialised(sectionsExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "sectionName", sections)
+    g_log.WriteLog "Number of Frame Force Objects after applying section filter = " & filteredFrmForces.count
     'Filter Members
     If genFuncs.isInitialised(MemberNamesExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "memberName", MemberNames)
+    g_log.WriteLog "Number of Frame Force Objects after applying member filter = " & filteredFrmForces.count
     'Filter load combinations
     If genFuncs.isInitialised(lcExcluded) Then Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "loadComb", lc)
+    g_log.WriteLog "Number of Frame Force Objects after applying load combination filter = " & filteredFrmForces.count
     'Filter Position
     'filterBool(0) = True
-    If posType = BothEnd Then
-        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEnd", True)
-    ElseIf posType = EndI Then
-        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndI", True)
-    ElseIf posType = EndJ Then
-        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndJ", True)
+    If PosFilterType = BothEnd Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEnd", Array(True))
+    ElseIf PosFilterType = EndI Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndI", Array(True))
+    ElseIf PosFilterType = EndJ Then
+        Set filteredFrmForces = pModel.FilterCollOfObj(filteredFrmForces, "isMemberEndJ", Array(True))
     End If
+    g_log.WriteLog "Number of Frame Force Objects after applying position filter = " & filteredFrmForces.count
     Set FilterFrmForces = filteredFrmForces
 End Function
 
@@ -122,11 +132,11 @@ Private Function GroupingFrmForces(frmForces As Collection) As Object
             keyPrefix = frmForce.memberName
         End If
         
-        If IsEachPos And IsEachLC Then
+        If isEachPos And IsEachLC Then
             key = keyPrefix & frmForce.loadComb & frmForce.pos_fromMemJtI_percent
-        ElseIf IsEachPos And Not IsEachLC Then
+        ElseIf isEachPos And Not IsEachLC Then
             key = keyPrefix & frmForce.pos_fromMemJtI_percent
-        ElseIf Not IsEachPos And IsEachLC Then
+        ElseIf Not isEachPos And IsEachLC Then
             key = keyPrefix & frmForce.loadComb
         Else
             key = keyPrefix
