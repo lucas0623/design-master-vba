@@ -8,4 +8,4 @@ This excel add-in addressed the issue by streamlining the daily design process w
 ![Pasted image 20250102141621](https://github.com/user-attachments/assets/6ab6d8ad-b2a4-4268-b27a-00681edfd46c)
 
 
-Documentation and tutorial in [Overview of Design Master Excel Add-in](https://lucas0623.github.io/design-master-vba-doc/).
+Documentation and tutorial in [Documentation of Design Master Excel Add-in](https://lucas0623.github.io/design-master-vba-doc/).
