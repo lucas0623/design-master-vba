@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UFInfo 
    Caption         =   "Information"
-   ClientHeight    =   2880
+   ClientHeight    =   2580
    ClientLeft      =   150
    ClientTop       =   6570
-   ClientWidth     =   7425
+   ClientWidth     =   5955
    OleObjectBlob   =   "UFInfo.frx":0000
 End
 Attribute VB_Name = "UFInfo"
@@ -60,6 +60,14 @@ End Sub
 Public Sub Initialize(version As String, releaseDate As String)
     Label1.caption = "Design Master " & version
     Label2.caption = "Release Date: " & releaseDate
+End Sub
+
+
+
+Private Sub Label4_Click()
+    Dim objShell As Object
+    Set objShell = CreateObject("Wscript.Shell")
+    objShell.Run ("https://github.com/lucas0623/design-master-vba")
 End Sub
 
 Private Sub LabelX_Click()

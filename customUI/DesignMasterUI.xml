@@ -80,6 +80,7 @@
 
 	<group id = "group10" label = "Info">
 		<button id = "btn_viewLog" label =  "View Log File" imageMso = "HappyFace" size = "large" onAction="ProcessRibbon_DM"/>
+		<button id = "btn_documentation" label =  "Doc" imageMso = "Help" size = "large" onAction="ProcessRibbon_DM"/>
 		<button id = "btn_version" label =  "Version" imageMso = "Info" size = "large" onAction="ProcessRibbon_DM"/>
 	</group>
 

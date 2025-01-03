@@ -83,6 +83,8 @@ Public Sub ProcessRibbon_DM(Control As IRibbonControl)
         'Info
         Case "btn_viewLog"
             DisplayLog
+        Case "btn_documentation"
+            ShowDocumentation
         Case "btn_version"
             ShowVersion
     End Select
@@ -150,14 +152,6 @@ Private Sub ClearBottomBorder()
     oper.ClearBorder_Hori
 End Sub
 
-Private Sub ImportDesignWorkbook()
-    
-    Dim oper As ImportDesignWorksheet
-    Set oper = New ImportDesignWorksheet
-    'oper.Initialize g_log
-    
-    oper.Main
-End Sub
 
 Private Sub ImportAndDelete(dataformat As SourceDataFormat)
     g_log.CreateNewFile isDetailMode
@@ -371,8 +365,14 @@ End Sub
 
 Private Sub ShowVersion()
     Dim uf As New UFInfo
-    UFInfo.Initialize "v4.1.4", "24 Dec 2024"
+    UFInfo.Initialize "v4.1.5", "01 Jan 2025"
     UFInfo.Show
+End Sub
+
+Private Sub ShowDocumentation()
+    Dim objShell As Object
+    Set objShell = CreateObject("Wscript.Shell")
+    objShell.Run ("https://lucas0623.github.io/design-master-vba-doc/")
 End Sub
 
 Public Sub TerminateProcedure()
