@@ -339,9 +339,17 @@ Sub InitializeDesignWsGroupData(sheetName As String)
     Else
         Exit Sub
     End If
-
+    'Add defined names
+        
     ' Initialize headers
     With ws
+        Dim newName As Name
+        Dim newNameStr As String, newRefersTo As String
+        newNameStr = "GetTableRange"
+        newRefersTo = "=LAMBDA(refCell,LET(maxRow,1048576,col,OFFSET(refCell,0,0,maxRow-ROW(refCell)+1,1),numRows,COUNTA(col),numCol,COLUMNS(refCell),returnRng,OFFSET(refCell,0,0,numRows,numCol),returnRng))"
+        Set newName = .Names.Add(Name:=newNameStr, RefersTo:=newRefersTo)
+        newName.Comment = "Expand the input row to the last row of the table (Until the next empty cell). INPUT: Ref Cell (first row of certain column in the table). RETURN: the spill range of the column. Last Update at 2024-02-04."
+        
         .Cells(2, 1).value = "rRow"
         .Range("B1").value = "Design Group 1"
         .Range("B1").Font.size = 16
@@ -349,31 +357,47 @@ Sub InitializeDesignWsGroupData(sheetName As String)
         
         ' Set header for Design Worksheet 1
         .Cells(2, 2).value = "Design Worksheet"
-        .Cells(2, 2).value = "Design Worksheet"
+        .Cells(2, 3).value = "isPrint?"
         .Cells(2, 4).value = "Design Ws IO Tag"
-        .Cells(2, 5).value = "isPrint?"
+        .Cells(2, 5).value = "Summary Tag?"
         .Cells(2, 6).value = "Header"
+        .Cells(2, 7).value = "Use Default Input?"
+        .Cells(2, 8).value = "Default Input Value"
         .Cells(3, 2).value = "Design Worksheet 1"
+        .Cells(3, 3).value = True
         .Cells(3, 4).formula = "=LET(row,2,colA,MATCH(B3,WSData!$1:$1,0)-1,colB,colA+2,VSTACK(GetTableRange(OFFSET(WSData!$A$1,2,colA)),GetTableRange(OFFSET(WSData!$A$1,2,colB))))"
-        .Cells(3, 5).value = "Summary tag1"
-        .Cells(3, 6).value = "Summary tag2"
-        .Cells(3, 7).value = "-"
-
+        .Cells(3, 5).value = "Summary tag 1"
+        .Cells(3, 6).value = "Summary header 1"
+        .Cells(3, 7).value = False
+        .Cells(3, 8).value = "-"
+        .Cells(4, 5).value = "Summary tag 2"
+        .Cells(4, 6).value = "Summary header 2"
+        .Cells(4, 7).value = False
+        .Cells(4, 8).value = "-"
+        .Cells(5, 5).value = "-"
+        .Cells(5, 6).value = "-"
+        .Cells(5, 7).value = True
+        .Cells(5, 8).value = 10
+        .Cells(6, 5).value = "-"
+        .Cells(6, 6).value = "-"
+        .Cells(6, 7).value = True
+        .Cells(6, 8).value = "S355"
         ' Merge and center headers across cells
-        .Range("B1:E1").HorizontalAlignment = xlCenterAcrossSelection
-
+        .Range("B1:H1").HorizontalAlignment = xlCenterAcrossSelection
+        
         ' Color columns B:I, except for row 2
         .Range("B3").Interior.Color = RGB(221, 235, 547)
         .Range("B3:D10").Interior.Color = RGB(221, 235, 547)
         .Columns("B:E").AutoFit
         
         .Columns("A").Borders(xlEdgeRight).LineStyle = xlContinuous
-        .Columns("E").Borders(xlEdgeRight).LineStyle = xlContinuous
+        .Columns("H").Borders(xlEdgeRight).LineStyle = xlContinuous
         .Columns("A").ColumnWidth = 0
         .Columns("B").ColumnWidth = 20
         .Columns("D").ColumnWidth = 20
         .Columns("F").ColumnWidth = 20
         .Columns("H").ColumnWidth = 20
+
     End With
 End Sub
 Sub InitializeDefineConnectionType(sheetName As String)
