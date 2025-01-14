@@ -433,7 +433,7 @@ Private Function ReadFrameForceTable() As Integer
             .Cells(fRow_SAP, col_stepDefault) = "N/A"
             .Cells(fRow_SAP - 2, col_stepDefault) = "StepType"
             lRow_SAPforce = wsInteract.FindLastRow(fRow_SAP, 1)
-            Set rng = Range(Cells(fRow_SAP, col_stepDefault), Cells(lRow_SAPforce, col_stepDefault))
+            Set rng = Range(.Cells(fRow_SAP, col_stepDefault), .Cells(lRow_SAPforce, col_stepDefault))
             .Cells(fRow_SAP, col_stepDefault).AutoFill Destination:=rng
         End If
     End With
