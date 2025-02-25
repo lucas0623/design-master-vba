@@ -78,6 +78,7 @@ Public Function Main(dataformat As SourceDataFormat, Optional isDelete As Boolea
     mFilePath = DataConvertor.GetUserInput
     ret = DataConvertor.ReadData(mFilePath)
     If ret = -1 Then GoTo TerminateSub
+    mLog.WriteLog "Successfuly Read GSA data table into data frame."
     
     mThisWorkbook.Activate
     Set df_ele = DataConvertor.DfEle
