@@ -63,9 +63,9 @@ Public Sub Class_Initialize()
     'pPath = fso.GetParentFolderName(ActiveWorkbook.path) & "/Log.txt"
     On Error GoTo Err:
     pPath = lib_fileTools.GetLocalPath(ActiveWorkbook.path) & "\Log.txt"
-    If fso.FileExists(pPath) Then Exit Sub
+    If fso.FileExists(pPath) Then GoTo ExitSub
     Set oFile = fso.CreateTextFile(pPath)
-    Exit Sub
+    GoTo ExitSub
 Err:
     'Cannot Find the path. Get user input of the input path
     pPath = mDataSheetSystem.prop("logFilePath", "path")
@@ -78,9 +78,10 @@ Err:
         pPath = pPath & "\Log.txt"
     End If
     
-    
-    
     Resume Next
+    Exit Sub
+ExitSub:
+     mDataSheetSystem.prop("logFilePath", "path") = pPath
 End Sub
 
 Property Let path(str As String)
@@ -135,7 +136,7 @@ Public Sub DisplayLog()
     Dim tempData As Variant
     
     tempData = Shell("notepad.exe " & pPath, vbNormalFocus)
-
+    
 End Sub
 Public Sub CloseFile(Optional isShowMsgBox As Boolean = False)
     
