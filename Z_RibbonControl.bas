@@ -365,7 +365,7 @@ End Sub
 
 Private Sub ShowVersion()
     Dim uf As New UFInfo
-    UFInfo.Initialize "v4.1.5", "01 Jan 2025"
+    UFInfo.Initialize "v4.1.7", "28 Jul 2025"
     UFInfo.Show
 End Sub
 

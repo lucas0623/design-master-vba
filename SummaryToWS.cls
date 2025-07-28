@@ -666,7 +666,9 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
             If tagsRelation.isDefaultInput(key) Then
                 val = tagsRelation.defaultInput(key)
                 g_log.WriteLog "     Input Tag: '" & key & "'; default value: " & val
-                targetWs.Range(WsInputs(tag_Ws)) = val
+                If Not targetWs.Range(WsInputs(tag_Ws)).value2 = val Then
+                    targetWs.Range(WsInputs(tag_Ws)) = val
+                End If
                 GoTo NextKey
             End If
         End If
@@ -683,8 +685,9 @@ Private Function TransferSingleDesignWorksheetData(targetWsIO As DesignWsIO, dfR
         
             val = df_sum.idata(dfRowNum, columnTags(tag_Summary).colNumInDF)
             g_log.WriteLog "     Input Tag: '" & key & ":" & tag_Summary & "'; value: " & val
-            
-            targetWs.Range(WsInputs(tag_Ws)) = val
+            If Not targetWs.Range(WsInputs(tag_Ws)).value2 = val Then
+                targetWs.Range(WsInputs(tag_Ws)) = val
+            End If
         Else
             If Not tag_Summary = "-" Then g_log.WriteLog "     Cannot find Input Tag in the summary sheet: '" & tag_Summary & "';"
         End If

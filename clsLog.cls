@@ -57,15 +57,25 @@ Public Enum ErrorType
 End Enum
 Public Sub Class_Initialize()
 
-    Dim lib_fileTools As clsLibFileTools
-    Set lib_fileTools = New clsLibFileTools
+    Dim folderPath As String
+    Dim filePath As String
+    Dim fileNumber As Integer
+    
     Set fso = CreateObject("Scripting.FileSystemObject")
-    'pPath = fso.GetParentFolderName(ActiveWorkbook.path) & "/Log.txt"
-    On Error GoTo Err:
-    pPath = lib_fileTools.GetLocalPath(ActiveWorkbook.path) & "\Log.txt"
+    
+    ' Define the folder path and file path
+    folderPath = Environ("LocalAppData") & "\DesignMasterAddin\"
+    pPath = folderPath & "log.txt"
+    
+    ' Check if the folder exists
+    If Dir(folderPath, vbDirectory) = "" Then
+        ' If the folder doesn't exist, create it
+        MkDir folderPath
+    End If
     If fso.FileExists(pPath) Then GoTo ExitSub
     Set oFile = fso.CreateTextFile(pPath)
     GoTo ExitSub
+    
 Err:
     'Cannot Find the path. Get user input of the input path
     pPath = mDataSheetSystem.prop("logFilePath", "path")
@@ -87,7 +97,22 @@ End Sub
 Property Let path(str As String)
     pPath = str
 End Property
-
+Sub CreateLogFile()
+    Dim folderPath As String
+    Dim filePath As String
+    Dim fileNumber As Integer
+    
+    ' Define the folder path and file path
+    folderPath = Environ("LocalAppData") & "\DesignMasterAddin\"
+    filePath = folderPath & "log.txt"
+    
+    ' Check if the folder exists
+    If Dir(folderPath, vbDirectory) = "" Then
+        ' If the folder doesn't exist, create it
+        MkDir folderPath
+    End If
+    
+End Sub
 Public Sub CreateNewFile(isDetailMode As Boolean)
     
     Set fso = CreateObject("Scripting.FileSystemObject")
